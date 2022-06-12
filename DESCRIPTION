@@ -1,13 +1,17 @@
 Package: biwt
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Functions to compute the biweight mean vector and covariance & correlation matrices
+Version: 1.1.0
+Author: Johanna Hardin
+Maintainer: Johanna Hardin <jo.hardin@pomona.edu>
+Description: Compute multivariate location, scale, and correlation estimates based on Tukey's biweight M-estimator.
+Imports:
+    robustbase,
+    MASS
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/hardin47/biwt
 BugReports: https://github.com/hardin47/biwt/issues
+RoxygenNote: 7.2.0
+biocViews: hopach
