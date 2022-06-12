@@ -6,11 +6,11 @@
 #' @param b0 a number
 #'
 #' @return a number
-#' @export
 #'
 #' @examples
 #' ksolve(rnorm(20,.1,2),1,3,1)
-`ksolve` <- function(d,p,c1,b0){
+#' @export
+ksolve <- function(d,p,c1,b0){
     k <- 1
     iter <- 1
     crit <- 100

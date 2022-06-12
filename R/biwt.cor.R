@@ -5,10 +5,12 @@
 #' @param median a logical command to determine whether the initialization is done using the coordinate-wise median and MAD (TRUE) or using the minimum covariance determinant (MCD)  (FALSE).  Using the MCD is substantially slower.
 #' @param full.init a logical command to determine whether the initialization is done for each pair separately (FALSE) or only one time at the beginning using the entire data matrix (TRUE).  Initializing for each pair separately is substantially slower.
 #'
+#' @importFrom MASS mvrnorm
+#' @importFrom robustbase covMcd
+#'
 #' @return returns a list consisting of:
-#' \item{biwt.corr} {a vector consisting of the lower triangle of the correlation matrix stored by columns in a vector, say bwcor. If \code{g} is the number of observations, i.e., then for \eqn{i < j \leq g}, the biweight correlation between (rows) \code{i} and \code{j} is bwcor[\code{g*(i-1) - i*(i-1)/2 + j-i}]. The length of the vector is \code{g*(g-1)/2}, i.e., of order \code{g^2}. }
-#' \item{biwt.NAid} {a vector which is indexed in the same way as \code{biwt.corr}.  The entries represent whether the biweight correlation was possible to compute (will be NA if too much data is missing or if the initializations are not accurate).  0 if computed accurately, 1 if NA.}
-#' @export
+#' \item{biwt.corr}{a vector consisting of the lower triangle of the correlation matrix stored by columns in a vector, say bwcor. If \code{g} is the number of observations, i.e., then for \eqn{i < j \leq g}, the biweight correlation between (rows) \code{i} and \code{j} is bwcor[\code{g*(i-1) - i*(i-1)/2 + j-i}]. The length of the vector is \code{g*(g-1)/2}, i.e., of order \code{g^2}. }
+#' \item{biwt.NAid}{a vector which is indexed in the same way as \code{biwt.corr}.  The entries represent whether the biweight correlation was possible to compute (will be NA if too much data is missing or if the initializations are not accurate).  0 if computed accurately, 1 if NA.}
 #'
 #' @examples
 #'
@@ -19,8 +21,8 @@
 #'
 #' samp.bw.cor <- biwt.cor(samp.data,r)
 #' samp.bw.cor
-`biwt.cor` <- function(x,r,median=T,full.init=T){
-
+#' @export
+biwt.cor <- function(x,r,median=T,full.init=T){
 
 if (full.init==T){
 

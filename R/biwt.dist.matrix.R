@@ -8,10 +8,14 @@
 #' @param full.init a logical command to determine whether the initialization is done for each pair separately (FALSE) or only one time at the beginning using the entire data matrix (TRUE).  Initializing for each pair separately is substantially slower.
 #' @param absval a logical command to determine whether the distance should be measured as 1 minus the absolute value of the correlation (TRUE) or simply 1 minus the correlation (FALSE)
 #'
+#' @importFrom MASS mvrnorm
+#' @importFrom robustbase covMcd
+#' @importFrom hopach dissmatrix
+#'
 #' @return a list consisting of
-#' \item{biwt.dist.matrix} {a matrix of the biweight distances (default is 1 minus absolute value of the biweight correlation).}
-#' \item{biwt.NAid.matrix} {a matrix representing whether the biweight correlation was possible to compute (will be NA if too much data is missing or if the initializations are not accurate).  0 if computed accurately, 1 if NA.}
-#' @export
+#' \item{biwt.dist.matrix}{a matrix of the biweight distances (default is 1 minus absolute value of the biweight correlation).}
+#' \item{biwt.NAid.matrix}{a matrix representing whether the biweight correlation was possible to compute (will be NA if too much data is missing or if the initializations are not accurate).  0 if computed accurately, 1 if NA.}
+#'
 #' @references Hardin, J., Mitani, A., Hicks, L., VanKoten, B.; A Robust Measure of Correlation Between Two Genes on a Microarray, \emph{BMC Bioinformatics, 8}:220; 2007.
 #'
 #' @examples samp.data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
@@ -23,7 +27,8 @@
 #'
 #' # To convert the distances into an element of class 'dist'
 #' as.dist(samp.bw.dist.mat$dist.mat)
-`biwt.dist.matrix` <- function(x,r,median=T,full.init=T,absval=T){
+#' @export
+biwt.dist.matrix <- function(x,r,median=T,full.init=T,absval=T){
 
 if (full.init==T){
 

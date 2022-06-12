@@ -7,16 +7,16 @@
 wtbw(x, c1)
 }
 \arguments{
-\item{x}{a number}
+\item{x}{a vector}
 
-\item{c1}{a cutoff}
+\item{c1}{a number}
 }
 \value{
-a number
+a vector
 }
 \description{
 Internal function
 }
 \examples{
-wtbw(2,3)
+wtbw(rnorm(10),3)
 }

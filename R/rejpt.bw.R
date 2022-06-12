@@ -4,11 +4,11 @@
 #' @param r the breakdown
 #'
 #' @return the asymptotic rejection point
-#' @export
 #'
 #' @examples
 #' rejpt.bw(2,3)
-`rejpt.bw` <- function(p,r){
+#' @export
+rejpt.bw <- function(p,r){
     c1 <- 2*p
     iter <- 1
     crit <- 100

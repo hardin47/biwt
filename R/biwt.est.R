@@ -3,16 +3,17 @@
 #' Compute a multivariate location and scale estimate based on Tukey's biweight weight function.
 #'
 #' @param x an \code{n x 2} matrix or data frame (\code{n} is the number of observations)
-#' @param r breakdown (\code{k/n} where \cdoe{k} is the largest number of observations that can be replaced with arbitrarily large values while keeping the estimates bounded)
+#' @param r breakdown (\code{k/n} where \code{k} is the largest number of observations that can be replaced with arbitrarily large values while keeping the estimates bounded)
 #' @param med.init a (robust) initial estimate of the center and shape of the data.  form is a list with components center and cov.
 #'
-#' @returnA list with components
-#' \item{biwt.mu} the final estimate of location
-#' \item{biwt.sig} the final estimate of scatter
-#' \item{biwt.NAid} a logical of whether the given initialization was used (coded as 0) or whether a more precise initialization was used (namely, the pair by pair MCD, coded as 1).
+#' @return A list with components
+#' \item{biwt.mu}{the final estimate of location}
+#' \item{biwt.sig}{the final estimate of scatter}
+#' \item{biwt.NAid}{a logical of whether the given initialization was used (coded as 0) or whether a more precise initialization was used (namely, the pair by pair MCD, coded as 1).}
 #' @references Hardin, J., Mitani, A., Hicks, L., VanKoten, B.; A Robust Measure of Correlation Between Two Genes on a Microarray, \emph{BMC Bioinformatics, 8}:220; 2007.
-#' @export
 #'
+#' @importFrom MASS mvrnorm
+#' @importFrom robustbase covMcd
 #' @examples
 #' samp.data <- MASS::mvrnorm(30,mu=c(0,0),Sigma=matrix(c(1,.75,.75,1),ncol=2))
 #' r<-0.2 # breakdown
@@ -40,8 +41,8 @@
 #'
 #' samp.bw <- biwt.est(samp.data,r,samp.init)
 #' samp.bw.corr <- samp.bw$biwt.sig[1,2] / sqrt(samp.bw$biwt.sig[1,1]*samp.bw$biwt.sig[2,2])
-
-`biwt.est` <- function(x,r,med.init){
+#' @export
+biwt.est <- function(x,r,med.init){
 
 p<-2
 n <- dim(x)[1]
@@ -66,7 +67,7 @@ crit <- 100
 iter <- 1
 while (crit > eps & iter < 100) {
 d <- d/k
-biwt.mu <- apply(wtbw(d,c1)*x,2,sum,na.rm=T) / sum (wtbw(d,c1),na.rm=T)
+biwt.mu <- apply(wtbw(d,c1)*x,2,sum,na.rm=T) / sum(wtbw(d,c1),na.rm=T)
 cent <- array(dim=c(n,p,p))
 for (i in 1:n){
 cent[i,,] <- (x[i,] - biwt.mu)%*%t(x[i,]-biwt.mu)}

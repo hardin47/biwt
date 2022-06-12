@@ -1,14 +1,14 @@
 #' Internal function
 #'
-#' @param x a number
+#' @param x a vector
 #' @param c1 a cutoff
 #'
-#' @return a number
-#' @export
+#' @return a vector
 #'
 #' @examples
-#' vbw(2,3)
-`vbw` <- function(x,c1){
-  return(psibw(x,c1)*x)
+#' vbw(rnorm(10),3)
+#' @export
+vbw <- function(x,c1) {
+  psibw(x,c1)*x
 }
 

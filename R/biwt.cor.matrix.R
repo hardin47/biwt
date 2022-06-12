@@ -8,10 +8,13 @@
 #' @param full.init a logical command to determine whether the initialization is done for each pair separately (FALSE) or only one time at the beginning using the entire data matrix (TRUE).  Initializing for each pair separately is substantially slower.
 #'
 #' @return returns a list consisting of:
-#' \item{biwt.corr.matrix} {a matrix of the biweight correlations.}
-#' \item{biwt.NAid.matrix} {a matrix representing whether the biweight correlation was possible to compute (will be NA if too much data is missing or if the initializations are not accurate).  0 if computed accurately, 1 if NA.}
+#' \item{biwt.corr.matrix}{a matrix of the biweight correlations.}
+#' \item{biwt.NAid.matrix}{a matrix representing whether the biweight correlation was possible to compute (will be NA if too much data is missing or if the initializations are not accurate).  0 if computed accurately, 1 if NA.}
 #' @references Hardin, J., Mitani, A., Hicks, L., VanKoten, B.; A Robust Measure of Correlation Between Two Genes on a Microarray, \emph{BMC Bioinformatics, 8}:220; 2007.
-#' @export
+#'
+#' @importFrom robustbase covMcd
+#' @importFrom MASS mvrnorm
+#' @importFrom hopach dissmatrix
 #'
 #' @examples
 #'
@@ -22,7 +25,8 @@
 #'
 #' samp.bw.cor.mat <- biwt.cor.matrix(samp.data,r)
 #' samp.bw.cor.mat
-`biwt.cor.matrix` <- function(x,r,median=T,full.init=T){
+#' @export
+biwt.cor.matrix <- function(x,r,median=T,full.init=T){
 
 library(hopach)
 library(robustbase)

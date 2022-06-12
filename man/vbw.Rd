@@ -7,16 +7,16 @@
 vbw(x, c1)
 }
 \arguments{
-\item{x}{a number}
+\item{x}{a vector}
 
 \item{c1}{a cutoff}
 }
 \value{
-a number
+a vector
 }
 \description{
 Internal function
 }
 \examples{
-vbw(2,3)
+vbw(rnorm(10),3)
 }
