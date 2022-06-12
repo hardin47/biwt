@@ -31,7 +31,7 @@ if (full.init==T){
 
 	if(median!=T){med.init <- robustbase::covMcd(x)}
 	else	{med.init<-list()
-		med.init$cov<-diag(1,2)*median(apply(x,1,mad,na.rm=T))
+		med.init$cov<-diag(1,2)*median(apply(x,1,stats::mad,na.rm=T))
 		med.init$center<-c(1,1)*median(apply(x,1,median,na.rm=T))
 		}
 	}
@@ -49,7 +49,7 @@ if (full.init !=T){
 
 	if (median!=T) {med.init<-robustbase::covMcd(cbind(x[,i],x[,j]))}
 	else		{med.init<-list()
-			med.init$cov <- diag(1,2)*apply(cbind(x[,i],x[,j]),2,mad,na.rm=T)
+			med.init$cov <- diag(1,2)*apply(cbind(x[,i],x[,j]),2,stats::mad,na.rm=T)
 			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=T)}
 	}
 

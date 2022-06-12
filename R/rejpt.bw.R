@@ -21,5 +21,5 @@ c1.old <- c1
         if (c1 < 0)  c1 <- c1.old/2
         crit <- abs(fc)
         iter <- iter+1    }
-    return(c(c1,pchisq(c1^2,p),log10(1-pchisq(c1^2,p))))}
+    return(c(c1,pchisq(c1^2,p),log10(1-stats::pchisq(c1^2,p))))}
 

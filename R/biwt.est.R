@@ -35,7 +35,7 @@
 #' ##############
 #'
 #' samp.init <- list()
-#' samp.init$cov <- diag(apply(samp.data,2,mad,na.rm=T))
+#' samp.init$cov <- diag(apply(samp.data,2,stats::mad,na.rm=T))
 #' samp.init$center <- apply(samp.data,2,median,na.rm=T)
 #'
 #' samp.bw <- biwt.est(samp.data,r,samp.init)
@@ -49,13 +49,13 @@ c1<-rejpt.bw(p=2,r)[1]
 b0<-erho.bw(p=2,c1)[1]
 
 NAid<-FALSE
-d <- sqrt(mahalanobis(x,med.init$center,med.init$cov))
+d <- sqrt(stats::mahalanobis(x,med.init$center,med.init$cov))
 k <- ksolve(d,p,c1,b0)
 
 if(is.na(k)) {
 NAid<-TRUE
 med.init <- robustbase::covMcd(x)
-d <- sqrt(mahalanobis(x,med.init$center,med.init$cov))
+d <- sqrt(stats::mahalanobis(x,med.init$center,med.init$cov))
 k <- ksolve(d,p,c1,b0)}
 # MCD is a more robust estimate of the center/shape
 # than the median which is sometimes used
@@ -74,7 +74,7 @@ biwt.sig <- apply(cent*wtbw(d,c1),c(2,3),sum,na.rm=T)/
 sum(vbw(d,c1),na.rm=T)
 
 
-d2 <- sqrt(mahalanobis(x,biwt.mu,biwt.sig))
+d2 <- sqrt(stats::mahalanobis(x,biwt.mu,biwt.sig))
 k <- ksolve(d2,p,c1,b0)
 crit <- max(abs(d-(d2/k)),na.rm=T)
 d <- d2
