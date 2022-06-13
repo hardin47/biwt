@@ -4,7 +4,7 @@
 \alias{biwt.dist.matrix}
 \title{A function to compute the biweight mean vector and covariance matrix}
 \usage{
-biwt.dist.matrix(x, r, median = T, full.init = T, absval = T)
+biwt.dist.matrix(x, r, median = TRUE, full.init = TRUE, absval = TRUE)
 }
 \arguments{
 \item{x}{an \code{n x g} matrix or data frame (\code{n} is the number of measurements, \code{g} is the number of observations (genes) )}
@@ -34,7 +34,7 @@ samp.bw.dist.mat <- biwt.dist.matrix(samp.data,r)
 samp.bw.dist.mat
 
 # To convert the distances into an element of class 'dist'
-as.dist(samp.bw.dist.mat$dist.mat)
+as.dist(samp.bw.dist.mat$biwt.dist.mat)
 }
 \references{
 Hardin, J., Mitani, A., Hicks, L., VanKoten, B.; A Robust Measure of Correlation Between Two Genes on a Microarray, \emph{BMC Bioinformatics, 8}:220; 2007.

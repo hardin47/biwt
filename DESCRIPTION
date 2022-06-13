@@ -5,7 +5,7 @@ Version: 1.1.0
 Authors@R: c(
    person(given = "Johanna", family = "Hardin", email = "jo.hardin@pomona.edu", role = c("aut", "cre")))
 Maintainer: Johanna Hardin <jo.hardin@pomona.edu>
-Description: Compute multivariate location, scale, and correlation estimates based on Tukey's biweight M-estimator
+Description: The base functions compute multivariate location, scale, and correlation estimates based on Tukey's biweight M-estimator.  Using the base function, the computations can be applied to a large number of observations to create either a matrix of biweight distances or biweight correlations. 
 Depends:
     R (>= 3.0.0)
 Imports:

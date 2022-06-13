@@ -15,6 +15,7 @@
 #' @importFrom robustbase covMcd
 #' @importFrom MASS mvrnorm
 #' @importFrom hopach dissmatrix
+#' @importFrom stats dchisq mad mahalanobis pchisq
 #'
 #' @examples
 #'
@@ -26,17 +27,17 @@
 #' samp.bw.cor.mat <- biwt.cor.matrix(samp.data,r)
 #' samp.bw.cor.mat
 #' @export
-biwt.cor.matrix <- function(x,r,median=T,full.init=T){
+biwt.cor.matrix <- function(x, r, median=TRUE, full.init=TRUE){
 
 library(hopach)
 library(robustbase)
 
-if (full.init==T){
+if (full.init==TRUE){
 
-	if(median!=T){med.init <- robustbase::covMcd(x)}
+	if(median!=TRUE){med.init <- robustbase::covMcd(x)}
 	else	{med.init<-list()
-		med.init$cov<-diag(1,2)*median(apply(x,1,stats::mad,na.rm=T))
-		med.init$center<-c(1,1)*median(apply(x,1,median,na.rm=T))
+		med.init$cov<-diag(1,2)*median(apply(x,1,stats::mad,na.rm=TRUE))
+		med.init$center<-c(1,1)*median(apply(x,1,median,na.rm=TRUE))
 		}
 	}
 
@@ -49,12 +50,12 @@ for(i in 1:g){
 	j <- 1
 	while(j < i){
 
-if (full.init !=T){
+if (full.init !=TRUE){
 
-	if (median!=T) {med.init<-robustbase::covMcd(cbind(x[,i],x[,j]))}
+	if (median!=TRUE) {med.init<-robustbase::covMcd(cbind(x[,i],x[,j]))}
 	else		{med.init<-list()
-			med.init$cov <- diag(1,2)*apply(cbind(x[,i],x[,j]),2,stats::mad,na.rm=T)
-			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=T)}
+			med.init$cov <- diag(1,2)*apply(cbind(x[,i],x[,j]),2,stats::mad,na.rm=TRUE)
+			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=TRUE)}
 	}
 
 	biwt <- biwt.est(cbind(x[,i],x[,j]),r,med.init)

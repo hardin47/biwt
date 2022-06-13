@@ -44,8 +44,8 @@ samp.bw.corr <- samp.bw$biwt.sig[1,2] / sqrt(samp.bw$biwt.sig[1,1]*samp.bw$biwt.
 ##############
 
 samp.init <- list()
-samp.init$cov <- diag(apply(samp.data,2,stats::mad,na.rm=T))
-samp.init$center <- apply(samp.data,2,median,na.rm=T)
+samp.init$cov <- diag(apply(samp.data, 2, stats::mad, na.rm=TRUE))
+samp.init$center <- apply(samp.data, 2, median, na.rm=TRUE)
 
 samp.bw <- biwt.est(samp.data,r,samp.init)
 samp.bw.corr <- samp.bw$biwt.sig[1,2] / sqrt(samp.bw$biwt.sig[1,1]*samp.bw$biwt.sig[2,2])

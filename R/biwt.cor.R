@@ -7,6 +7,7 @@
 #'
 #' @importFrom MASS mvrnorm
 #' @importFrom robustbase covMcd
+#' @importFrom stats dchisq mad mahalanobis pchisq
 #'
 #' @return returns a list consisting of:
 #' \item{biwt.corr}{a vector consisting of the lower triangle of the correlation matrix stored by columns in a vector, say bwcor. If \code{g} is the number of observations, i.e., then for \eqn{i < j \leq g}, the biweight correlation between (rows) \code{i} and \code{j} is bwcor[\code{g*(i-1) - i*(i-1)/2 + j-i}]. The length of the vector is \code{g*(g-1)/2}, i.e., of order \code{g^2}. }
@@ -22,14 +23,14 @@
 #' samp.bw.cor <- biwt.cor(samp.data,r)
 #' samp.bw.cor
 #' @export
-biwt.cor <- function(x,r,median=T,full.init=T){
+biwt.cor <- function(x, r, median=TRUE, full.init=TRUE){
 
-if (full.init==T){
+if (full.init==TRUE){
 
-	if(median!=T){med.init <- robustbase::covMcd(x)}
+	if(median!=TRUE){med.init <- robustbase::covMcd(x)}
 	else	{med.init<-list()
-		med.init$cov<-diag(1,2)*median(apply(x,1,stats::mad,na.rm=T))
-		med.init$center<-c(1,1)*median(apply(x,1,median,na.rm=T))
+		med.init$cov<-diag(1,2)*median(apply(x,1,stats::mad,na.rm=TRUE))
+		med.init$center<-c(1,1)*median(apply(x,1,median,na.rm=TRUE))
 		}
 	}
 
@@ -42,12 +43,12 @@ for(i in 1:g){
 	j <- 1
 	while(j < i){
 
-if (full.init !=T){
+if (full.init !=TRUE){
 
-	if (median!=T) {med.init <- robustbase::covMcd(cbind(x[,i],x[,j]))}
+	if (median!=TRUE) {med.init <- robustbase::covMcd(cbind(x[,i],x[,j]))}
 	else		{med.init<-list()
-			med.init$cov <- diag(1,2)*apply(cbind(x[,i],x[,j]),2,stats::mad,na.rm=T)
-			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=T)}
+			med.init$cov <- diag(1,2)*apply(cbind(x[,i],x[,j]),2,stats::mad,na.rm=TRUE)
+			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=TRUE)}
 	}
 
 	biwt <- biwt.est(cbind(x[,i],x[,j]),r,med.init)

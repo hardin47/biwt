@@ -11,6 +11,7 @@
 #' @importFrom MASS mvrnorm
 #' @importFrom robustbase covMcd
 #' @importFrom hopach dissmatrix
+#' @importFrom stats dchisq mad mahalanobis pchisq
 #'
 #' @return a list consisting of
 #' \item{biwt.dist.matrix}{a matrix of the biweight distances (default is 1 minus absolute value of the biweight correlation).}
@@ -18,7 +19,8 @@
 #'
 #' @references Hardin, J., Mitani, A., Hicks, L., VanKoten, B.; A Robust Measure of Correlation Between Two Genes on a Microarray, \emph{BMC Bioinformatics, 8}:220; 2007.
 #'
-#' @examples samp.data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
+#' @examples
+#' samp.data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
 #' r<-0.2 # breakdown
 #'
 #' # To compute the 3 pairwise distances in matrix form:
@@ -26,16 +28,16 @@
 #' samp.bw.dist.mat
 #'
 #' # To convert the distances into an element of class 'dist'
-#' as.dist(samp.bw.dist.mat$dist.mat)
+#' as.dist(samp.bw.dist.mat$biwt.dist.mat)
 #' @export
-biwt.dist.matrix <- function(x,r,median=T,full.init=T,absval=T){
+biwt.dist.matrix <- function(x, r, median=TRUE, full.init=TRUE, absval=TRUE){
 
-if (full.init==T){
+if (full.init==TRUE){
 
-	if(median!=T){med.init <- robustbase::covMcd(x)}
+	if(median!=TRUE){med.init <- robustbase::covMcd(x)}
 	else	{med.init<-list()
-		med.init$cov<-diag(1,2)*median(apply(x,1,stats::mad,na.rm=T))
-		med.init$center<-c(1,1)*median(apply(x,1,median,na.rm=T))
+		med.init$cov<-diag(1,2)*median(apply(x,1,stats::mad,na.rm=TRUE))
+		med.init$center<-c(1,1)*median(apply(x,1,median,na.rm=TRUE))
 		}
 	}
 
@@ -48,12 +50,12 @@ for(i in 1:g){
 	j <- 1
 	while(j < i){
 
-if (full.init !=T){
+if (full.init !=TRUE){
 
-	if (median!=T) {med.init<-robustbase::covMcd(cbind(x[,i],x[,j]))}
+	if (median!=TRUE) {med.init<-robustbase::covMcd(cbind(x[,i],x[,j]))}
 	else		{med.init<-list()
-			med.init$cov <- diag(1,2)*apply(cbind(x[,i],x[,j]),2,stats::mad,na.rm=T)
-			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=T)}
+			med.init$cov <- diag(1,2)*apply(cbind(x[,i],x[,j]),2,stats::mad,na.rm=TRUE)
+			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=TRUE)}
 	}
 
 	biwt <- biwt.est(cbind(x[,i],x[,j]),r,med.init)
@@ -64,7 +66,7 @@ if (full.init !=T){
 
 	}
 
-if(absval==T){dist.mat <- hopach::dissmatrix(1 - abs(corr))}
+if(absval==TRUE){dist.mat <- hopach::dissmatrix(1 - abs(corr))}
 else {dist.mat <- hopach::dissmatrix(1 - corr)}
 
 diag(dist.mat) <- 0

@@ -4,7 +4,7 @@
 \alias{biwt.cor}
 \title{A function to compute the biweight mean vector and covariance matrix}
 \usage{
-biwt.cor(x, r, median = T, full.init = T)
+biwt.cor(x, r, median = TRUE, full.init = TRUE)
 }
 \arguments{
 \item{x}{an \code{n x g} matrix or data frame (\code{n} is the number of measurements, \code{g} is the number of observations (genes) )}
