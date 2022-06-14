@@ -29,8 +29,6 @@
 #' @export
 biwt.cor.matrix <- function(x, r, median=TRUE, full.init=TRUE){
 
-library(hopach)
-library(robustbase)
 
 if (full.init==TRUE){
 
