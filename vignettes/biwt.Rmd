@@ -1,0 +1,27 @@
+---
+title: "biwt"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{biwt}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(biwt)
+```
+
+
+# What is the biweight?
+
+# How to use the biweight correlation
+
+# The biweight correlation on Cauchy data
+
