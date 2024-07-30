@@ -24,10 +24,10 @@
 #'
 #' # To compute the 3 pairwise correlations in matrix form:
 #'
-#' samp.bw.cor.mat <- biwt.cor.matrix(samp.data,r)
+#' samp.bw.cor.mat <- biwt_cor_matrix(samp.data,r)
 #' samp.bw.cor.mat
 #' @export
-biwt.cor.matrix <- function(x, r, median=TRUE, full.init=TRUE){
+biwt_cor_matrix <- function(x, r, median=TRUE, full.init=TRUE){
 
 
 if (full.init==TRUE){
@@ -56,9 +56,8 @@ if (full.init !=TRUE){
 			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=TRUE)}
 	}
 
-	biwt <- biwt_est(cbind(x[,i],x[,j]), r, med.init)
-	corr <- c(corr,biwt$biwt.sig[1,2] /
-	            sqrt(biwt$biwt.sig[1,1] * biwt$biwt.sig[2,2]))
+	biwt <- biwt_est(cbind(x[,i],x[,j]),r,med.init)
+	corr <- c(corr,biwt$biwt.sig[1,2]/sqrt(biwt$biwt.sig[1,1]*biwt$biwt.sig[2,2]))
 	NAid <- c(NAid,biwt$biwt.NAid)
 	j<-j+1
 	}

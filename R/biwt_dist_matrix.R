@@ -6,29 +6,31 @@
 #' @param r breakdown (\code{k/n} where \code{k} is the largest number of observations that can be replaced with arbitrarily large values while keeping the estimates bounded)
 #' @param median a logical command to determine whether the initialization is done using the coordinate-wise median and MAD (TRUE) or using the minimum covariance determinant (MCD)  (FALSE).  Using the MCD is substantially slower.
 #' @param full.init a logical command to determine whether the initialization is done for each pair separately (FALSE) or only one time at the beginning using the entire data matrix (TRUE).  Initializing for each pair separately is substantially slower.
+#' @param absval a logical command to determine whether the distance should be measured as 1 minus the absolute value of the correlation (TRUE) or simply 1 minus the correlation (FALSE)
 #'
-#' @return returns a list consisting of:
-#' \item{biwt.corr.matrix}{a matrix of the biweight correlations.}
-#' \item{biwt.NAid.matrix}{a matrix representing whether the biweight correlation was possible to compute (will be NA if too much data is missing or if the initializations are not accurate).  0 if computed accurately, 1 if NA.}
-#' @references Hardin, J., Mitani, A., Hicks, L., VanKoten, B.; A Robust Measure of Correlation Between Two Genes on a Microarray, \emph{BMC Bioinformatics, 8}:220; 2007.
-#'
-#' @importFrom robustbase covMcd
 #' @importFrom MASS mvrnorm
+#' @importFrom robustbase covMcd
 #' @importFrom hopach dissmatrix
 #' @importFrom stats dchisq mad mahalanobis pchisq
 #'
-#' @examples
+#' @return a list consisting of
+#' \item{biwt.dist.matrix}{a matrix of the biweight distances (default is 1 minus absolute value of the biweight correlation).}
+#' \item{biwt.NAid.matrix}{a matrix representing whether the biweight correlation was possible to compute (will be NA if too much data is missing or if the initializations are not accurate).  0 if computed accurately, 1 if NA.}
 #'
+#' @references Hardin, J., Mitani, A., Hicks, L., VanKoten, B.; A Robust Measure of Correlation Between Two Genes on a Microarray, \emph{BMC Bioinformatics, 8}:220; 2007.
+#'
+#' @examples
 #' samp.data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
 #' r <- 0.2 # breakdown
 #'
-#' # To compute the 3 pairwise correlations in matrix form:
+#' # To compute the 3 pairwise distances in matrix form:
+#' samp.bw.dist.mat <- biwt_dist_matrix(samp.data, r)
+#' samp.bw.dist.mat
 #'
-#' samp.bw.cor.mat <- biwt.cor.matrix(samp.data,r)
-#' samp.bw.cor.mat
+#' # To convert the distances into an element of class 'dist'
+#' as.dist(samp.bw.dist.mat$biwt.dist.mat)
 #' @export
-biwt.cor.matrix <- function(x, r, median=TRUE, full.init=TRUE){
-
+biwt_dist_matrix <- function(x, r, median=TRUE, full.init=TRUE, absval=TRUE){
 
 if (full.init==TRUE){
 
@@ -56,21 +58,22 @@ if (full.init !=TRUE){
 			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=TRUE)}
 	}
 
-	biwt <- biwt_est(cbind(x[,i],x[,j]), r, med.init)
-	corr <- c(corr,biwt$biwt.sig[1,2] /
-	            sqrt(biwt$biwt.sig[1,1] * biwt$biwt.sig[2,2]))
+	biwt <- biwt_est(cbind(x[,i],x[,j]),r,med.init)
+	corr <- c(corr,biwt$biwt.sig[1,2]/sqrt(biwt$biwt.sig[1,1]*biwt$biwt.sig[2,2]))
 	NAid <- c(NAid,biwt$biwt.NAid)
 	j<-j+1
 	}
 
 	}
 
-corr.mat <- hopach::dissmatrix(corr)
-diag(corr.mat) <- 1
+if(absval==TRUE){dist.mat <- hopach::dissmatrix(1 - abs(corr))}
+else {dist.mat <- hopach::dissmatrix(1 - corr)}
+
+diag(dist.mat) <- 0
 
 NAid.mat <- hopach::dissmatrix(NAid)
 
-return(list(biwt.corr.mat = corr.mat, biwt.NAid.mat=NAid.mat))}
+return(list(biwt.dist.mat = dist.mat, biwt.NAid.mat=NAid.mat))}
 
 
 

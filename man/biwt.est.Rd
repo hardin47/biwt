@@ -4,51 +4,54 @@
 \alias{biwt.est}
 \title{A function to compute the biweight mean vector and covariance matrix}
 \usage{
-biwt.est(x, r, med.init)
+biwt.est(x, r = 0.2, med.init = covMcd(x))
 }
 \arguments{
-\item{x}{an \code{n x 2} matrix or data frame (\code{n} is the number of observations)}
+\item{x}{a \code{2 x n} matrix or data frame (\code{n} is the number of measurements)}
 
-\item{r}{breakdown (\code{k/n} where \code{k} is the largest number of observations that can be replaced with arbitrarily large values while keeping the estimates bounded)}
+\item{r}{breakdown (\code{k/n} where \code{k} is the largest number of measurements that can be replaced with arbitrarily large values while keeping the estimates bounded). Default is \code{r = 0.2}.}
 
-\item{med.init}{a (robust) initial estimate of the center and shape of the data.  form is a list with components center and cov.}
+\item{med.init}{a (robust) initial estimate of the center and shape of the data.  The format is a list with components center and cov (as in the output of \code{covMcd()} from the rrcov package). Default is the minimum covariance determinant (MCD) on the data.}
 }
 \value{
 A list with components
-\item{biwt.mu}{the final estimate of location}
-\item{biwt.sig}{the final estimate of scatter}
-\item{biwt.NAid}{a logical of whether the given initialization was used (coded as 0) or whether a more precise initialization was used (namely, the pair by pair MCD, coded as 1).}
+\item{biwt.mu}{the final estimate of center}
+\item{biwt.sig}{the final estimate of shape}
 }
 \description{
 Compute a multivariate location and scale estimate based on Tukey's biweight weight function.
 }
 \examples{
-samp.data <- MASS::mvrnorm(30,mu=c(0,0),Sigma=matrix(c(1,.75,.75,1),ncol=2))
-r<-0.2 # breakdown
+samp.data <- t(MASS::mvrnorm(30,mu=c(0,0),
+               Sigma=matrix(c(1,.75,.75,1),ncol=2)))
 
-samp.mcd <- robustbase::covMcd(samp.data)
-samp.bw <- biwt.est(samp.data,r,samp.mcd)
+samp.bw <- biwt.est(samp.data)
+samp.bw
 
 samp.bw.var1 <- samp.bw$biwt.sig[1,1]
 samp.bw.var2 <- samp.bw$biwt.sig[2,2]
 samp.bw.cov <- samp.bw$biwt.sig[1,2]
 
-samp.bw.corr <- samp.bw.cov / sqrt(samp.bw.var1 * samp.bw.var2)
+samp.bw.cor <- samp.bw.cov / sqrt(samp.bw.var1 * samp.bw.var2)
+samp.bw.cor
 
 # or:
 
-samp.bw.corr <- samp.bw$biwt.sig[1,2] / sqrt(samp.bw$biwt.sig[1,1]*samp.bw$biwt.sig[2,2])
+samp.bw.cor <- samp.bw$biwt.sig[1,2] / sqrt(samp.bw$biwt.sig[1,1]*samp.bw$biwt.sig[2,2])
+samp.bw.cor
 
 ##############
 # to speed up the calculations, use the median/mad for the initialization:
 ##############
 
 samp.init <- list()
-samp.init$cov <- diag(apply(samp.data, 2, stats::mad, na.rm=TRUE))
-samp.init$center <- apply(samp.data, 2, median, na.rm=TRUE)
+samp.init$cov <- diag(apply(samp.data, 1, stats::mad, na.rm=TRUE))
+samp.init$center <- apply(samp.data, 1, median, na.rm=TRUE)
+samp.init
 
-samp.bw <- biwt.est(samp.data,r,samp.init)
-samp.bw.corr <- samp.bw$biwt.sig[1,2] / sqrt(samp.bw$biwt.sig[1,1]*samp.bw$biwt.sig[2,2])
+samp.bw <- biwt.est(samp.data, med.init = samp.init)
+samp.bw.cor <- samp.bw$biwt.sig[1,2] / sqrt(samp.bw$biwt.sig[1,1]*samp.bw$biwt.sig[2,2])
+samp.bw.cor
 }
 \references{
 Hardin, J., Mitani, A., Hicks, L., VanKoten, B.; A Robust Measure of Correlation Between Two Genes on a Microarray, \emph{BMC Bioinformatics, 8}:220; 2007.

@@ -1,9 +1,11 @@
 #' A function to compute the biweight mean vector and covariance matrix
 #'
-#' @param x an \code{n x g} matrix or data frame (\code{n} is the number of measurements, \code{g} is the number of observations (genes) )
-#' @param r breakdown (\code{k/n} where \code{k} is the largest number of observations that can be replaced with arbitrarily large values while keeping the estimates bounded)
-#' @param median a logical command to determine whether the initialization is done using the coordinate-wise median and MAD (TRUE) or using the minimum covariance determinant (MCD)  (FALSE).  Using the MCD is substantially slower.
-#' @param full.init a logical command to determine whether the initialization is done for each pair separately (FALSE) or only one time at the beginning using the entire data matrix (TRUE).  Initializing for each pair separately is substantially slower.
+#' @param x a \code{g x n} matrix or data frame (\code{n} is the number of measurements, \code{g} is the number of observations (genes) )
+#' @param r breakdown (\code{k/n} where \code{k} is the largest number of observations that can be replaced with arbitrarily large values while keeping the estimates bounded). Default is \code{r = 0.2}.
+#' @param output a character string specifying the output format.  Options are "matrix" (default), "vector", or "distance".  See value below.
+#' @param median a logical command to determine whether the initialization is done using the coordinate-wise median and MAD^2 (TRUE, default) or using the minimum covariance determinant (MCD) (FALSE).  Using the MCD is substantially slower. The MAD is the median of the absolute deviations from the median.  See R help file on \code{mad}.
+#' @param full.init a logical command to determine whether the initialization is done for each pair separately (FALSE) or only one time at the beginning using the entire data matrix (TRUE, default).  Initializing for each pair separately is substantially slower.
+#' @param absval a logical command to determine whether the distance should be measured as 1 minus the absolute value of the correlation (TRUE, default) or as 1 minus the correlation (FALSE).
 #'
 #' @importFrom MASS mvrnorm
 #' @importFrom robustbase covMcd
@@ -15,47 +17,125 @@
 #'
 #' @examples
 #'
-#' samp.data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
-#' r<-0.2 # breakdown
+#' samp.data <- t(MASS::mvrnorm(30,mu=c(0,0,0),
+#'                Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3)))
 #'
 #' # To compute the 3 pairwise correlations from the sample data:
 #'
-#' samp.bw.cor <- biwt.cor(samp.data,r)
+#' samp.bw.cor <- biwt.cor(samp.data, output="vector")
 #' samp.bw.cor
+#'
+#' # To compute the 3 pairwise correlations in matrix form:
+#'
+#' samp.bw.cor.mat <- biwt.cor(samp.data)
+#' samp.bw.cor.mat
+#'
+#' # To compute the 3 pairwise distances in matrix form:
+#'
+#' samp.bw.dist.mat <- biwt.cor(samp.data, output="distance")
+#' samp.bw.dist.mat
+#'
+#' # To convert the distances into an object of class `dist'
+#'
+#' as.dist(samp.bw.dist.mat)
 #' @export
-biwt.cor <- function(x, r, median=TRUE, full.init=TRUE){
-
-if (full.init==TRUE){
-
-	if(median!=TRUE){med.init <- robustbase::covMcd(x)}
-	else	{med.init<-list()
-		med.init$cov<-diag(1,2)*median(apply(x,1,stats::mad,na.rm=TRUE))
-		med.init$center<-c(1,1)*median(apply(x,1,median,na.rm=TRUE))
-		}
-	}
-
-	corr <- c()
-	NAid <- c()
-	g <- dim(x)[2]
-
-
-for(i in 1:g){
-	j <- 1
-	while(j < i){
-
-if (full.init !=TRUE){
-
-	if (median!=TRUE) {med.init <- robustbase::covMcd(cbind(x[,i],x[,j]))}
-	else		{med.init<-list()
-			med.init$cov <- diag(1,2)*apply(cbind(x[,i],x[,j]),2,stats::mad,na.rm=TRUE)
-			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=TRUE)}
-	}
-
-	biwt <- biwt.est(cbind(x[,i],x[,j]),r,med.init)
-	corr <- c(corr,biwt$biwt.sig[1,2]/sqrt(biwt$biwt.sig[1,1]*biwt$biwt.sig[2,2]))
-	NAid <- c(NAid,biwt$NAid)
-	j<-j+1
-	}
-
-	}
-return(list(biwt.corr=corr,biwt.NAid=NAid))}
+biwt.cor <- function (x, r = 0.2, output = "matrix", median = TRUE, full.init = TRUE,
+                      absval = TRUE)
+{
+  if (full.init == TRUE) {
+    rand.samp <- x[sample(1:nrow(x), 2), ]
+    if (median != TRUE) {
+      med.init <- covMcd(t(rand.samp))
+    }
+    else {
+      med.init <- list()
+      med.init$cov <- diag(1, 2) * (apply(rand.samp, 1,
+                                          mad, na.rm = TRUE))^2
+      med.init$center <- c(1, 1) * apply(rand.samp, 1,
+                                         median, na.rm = TRUE)
+    }
+  }
+  corr <- c()
+  g <- dim(x)[1]
+  if (output == "matrix") {
+    for (i in 1:g) {
+      j <- 1
+      while (j < i) {
+        if (full.init != TRUE) {
+          if (median != TRUE) {
+            med.init <- covMcd(cbind(x[i, ], x[j, ]))
+          }
+          else {
+            med.init <- list()
+            med.init$cov <- diag(1, 2) * (apply(cbind(x[i,
+            ], x[j, ]), 2, mad, na.rm = TRUE))^2
+            med.init$center <- apply(cbind(x[i, ], x[j,
+            ]), 2, median, na.rm = TRUE)
+          }
+        }
+        biwt <- biwt.est(rbind(x[i, ], x[j, ]), r, med.init)
+        corr <- c(corr, biwt$biwt.sig[1, 2]/sqrt(biwt$biwt.sig[1,
+                                                               1] * biwt$biwt.sig[2, 2]))
+        j <- j + 1
+      }
+    }
+    corr.mat <- vect2diss(corr)
+    diag(corr.mat) <- 1
+    return(corr.mat)
+  }
+  if (output == "distance") {
+    for (i in 1:g) {
+      j <- 1
+      while (j < i) {
+        if (full.init != TRUE) {
+          if (median != TRUE) {
+            med.init <- covMcd(cbind(x[i, ], x[j, ]))
+          }
+          else {
+            med.init <- list()
+            med.init$cov <- diag(1, 2) * (apply(cbind(x[i,
+            ], x[j, ]), 2, mad, na.rm = TRUE))^2
+            med.init$center <- apply(cbind(x[i, ], x[j,
+            ]), 2, median, na.rm = TRUE)
+          }
+        }
+        biwt <- biwt.est(rbind(x[i, ], x[j, ]), r, med.init)
+        corr <- c(corr, biwt$biwt.sig[1, 2]/sqrt(biwt$biwt.sig[1,
+                                                               1] * biwt$biwt.sig[2, 2]))
+        j <- j + 1
+      }
+    }
+    if (absval == TRUE) {
+      dist.mat <- vect2diss(1 - abs(corr))
+    }
+    else {
+      dist.mat <- vect2diss(1 - corr)
+    }
+    diag(dist.mat) <- 0
+    return(dist.mat)
+  }
+  if (output == "vector") {
+    for (i in 1:g) {
+      j <- 1
+      while (j < i) {
+        if (full.init != TRUE) {
+          if (median != TRUE) {
+            med.init <- covMcd(cbind(x[i, ], x[j, ]))
+          }
+          else {
+            med.init <- list()
+            med.init$cov <- diag(1, 2) * (apply(cbind(x[i,
+            ], x[j, ]), 2, mad, na.rm = TRUE))^2
+            med.init$center <- apply(cbind(x[i, ], x[j,
+            ]), 2, median, na.rm = TRUE)
+          }
+        }
+        biwt <- biwt.est(rbind(x[i, ], x[j, ]), r, med.init)
+        corr <- c(corr, biwt$biwt.sig[1, 2]/sqrt(biwt$biwt.sig[1,
+                                                               1] * biwt$biwt.sig[2, 2]))
+        j <- j + 1
+      }
+    }
+    return(corr)
+  }
+}

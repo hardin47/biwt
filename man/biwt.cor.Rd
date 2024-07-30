@@ -4,16 +4,27 @@
 \alias{biwt.cor}
 \title{A function to compute the biweight mean vector and covariance matrix}
 \usage{
-biwt.cor(x, r, median = TRUE, full.init = TRUE)
+biwt.cor(
+  x,
+  r = 0.2,
+  output = "matrix",
+  median = TRUE,
+  full.init = TRUE,
+  absval = TRUE
+)
 }
 \arguments{
-\item{x}{an \code{n x g} matrix or data frame (\code{n} is the number of measurements, \code{g} is the number of observations (genes) )}
+\item{x}{a \code{g x n} matrix or data frame (\code{n} is the number of measurements, \code{g} is the number of observations (genes) )}
 
-\item{r}{breakdown (\code{k/n} where \code{k} is the largest number of observations that can be replaced with arbitrarily large values while keeping the estimates bounded)}
+\item{r}{breakdown (\code{k/n} where \code{k} is the largest number of observations that can be replaced with arbitrarily large values while keeping the estimates bounded). Default is \code{r = 0.2}.}
 
-\item{median}{a logical command to determine whether the initialization is done using the coordinate-wise median and MAD (TRUE) or using the minimum covariance determinant (MCD)  (FALSE).  Using the MCD is substantially slower.}
+\item{output}{a character string specifying the output format.  Options are "matrix" (default), "vector", or "distance".  See value below.}
 
-\item{full.init}{a logical command to determine whether the initialization is done for each pair separately (FALSE) or only one time at the beginning using the entire data matrix (TRUE).  Initializing for each pair separately is substantially slower.}
+\item{median}{a logical command to determine whether the initialization is done using the coordinate-wise median and MAD^2 (TRUE, default) or using the minimum covariance determinant (MCD) (FALSE).  Using the MCD is substantially slower. The MAD is the median of the absolute deviations from the median.  See R help file on \code{mad}.}
+
+\item{full.init}{a logical command to determine whether the initialization is done for each pair separately (FALSE) or only one time at the beginning using the entire data matrix (TRUE, default).  Initializing for each pair separately is substantially slower.}
+
+\item{absval}{a logical command to determine whether the distance should be measured as 1 minus the absolute value of the correlation (TRUE, default) or as 1 minus the correlation (FALSE).}
 }
 \value{
 returns a list consisting of:
@@ -25,11 +36,25 @@ A function to compute the biweight mean vector and covariance matrix
 }
 \examples{
 
-samp.data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
-r<-0.2 # breakdown
+samp.data <- t(MASS::mvrnorm(30,mu=c(0,0,0),
+               Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3)))
 
 # To compute the 3 pairwise correlations from the sample data:
 
-samp.bw.cor <- biwt.cor(samp.data,r)
+samp.bw.cor <- biwt.cor(samp.data, output="vector")
 samp.bw.cor
+
+# To compute the 3 pairwise correlations in matrix form:
+
+samp.bw.cor.mat <- biwt.cor(samp.data)
+samp.bw.cor.mat
+
+# To compute the 3 pairwise distances in matrix form:
+
+samp.bw.dist.mat <- biwt.cor(samp.data, output="distance")
+samp.bw.dist.mat
+
+# To convert the distances into an object of class `dist'
+
+as.dist(samp.bw.dist.mat)
 }

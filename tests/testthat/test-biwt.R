@@ -6,6 +6,6 @@ test_that("function runs", {
 
                r<-0.2 # breakdown
 
-               biwt.cor(samp.data[,1:2], r=.2)$biwt.cor}, 0.6605525,
+               biwt_cor(samp.data[,1:2], r=.2)$biwt.cor}, 0.6605525,
                tolerance = 0.01)
 })
