@@ -47,6 +47,7 @@
 #' @export
 biwt_est <- function(x, r, med.init){
 
+if(!is.matrix(x)) x <- as.matrix(x)
 p<-2
 n <- dim(x)[1]
 c1<-rejpt.bw(p=2,r)[1]

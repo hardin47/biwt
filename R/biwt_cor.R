@@ -25,6 +25,8 @@
 #' @export
 biwt_cor <- function(x, r, median=TRUE, full.init=TRUE){
 
+if(!is.matrix(x)) x <- as.matrix(x)
+
 if (full.init==TRUE){
 
 	if(median!=TRUE){med.init <- robustbase::covMcd(x)}

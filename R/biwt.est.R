@@ -47,7 +47,7 @@
 #' samp.bw.cor <- samp.bw$biwt.sig[1,2] / sqrt(samp.bw$biwt.sig[1,1]*samp.bw$biwt.sig[2,2])
 #' samp.bw.cor
 #' @export
-biwt.est <- function (x, r = 0.2, med.init = covMcd(x))
+biwt.est <- function (x, r = 0.2, med.init = robustbase::covMcd(x))
 {
   p <- 2
   n <- dim(x)[2]

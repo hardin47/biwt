@@ -4,7 +4,7 @@
 \alias{biwt.est}
 \title{A function to compute the biweight mean vector and covariance matrix}
 \usage{
-biwt.est(x, r = 0.2, med.init = covMcd(x))
+biwt.est(x, r = 0.2, med.init = robustbase::covMcd(x))
 }
 \arguments{
 \item{x}{a \code{2 x n} matrix or data frame (\code{n} is the number of measurements)}

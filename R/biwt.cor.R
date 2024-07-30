@@ -45,7 +45,7 @@ biwt.cor <- function (x, r = 0.2, output = "matrix", median = TRUE, full.init = 
   if (full.init == TRUE) {
     rand.samp <- x[sample(1:nrow(x), 2), ]
     if (median != TRUE) {
-      med.init <- covMcd(t(rand.samp))
+      med.init <- robustbase::covMcd(t(rand.samp))
     }
     else {
       med.init <- list()
@@ -63,7 +63,7 @@ biwt.cor <- function (x, r = 0.2, output = "matrix", median = TRUE, full.init = 
       while (j < i) {
         if (full.init != TRUE) {
           if (median != TRUE) {
-            med.init <- covMcd(cbind(x[i, ], x[j, ]))
+            med.init <- robustbase::covMcd(cbind(x[i, ], x[j, ]))
           }
           else {
             med.init <- list()
@@ -89,7 +89,7 @@ biwt.cor <- function (x, r = 0.2, output = "matrix", median = TRUE, full.init = 
       while (j < i) {
         if (full.init != TRUE) {
           if (median != TRUE) {
-            med.init <- covMcd(cbind(x[i, ], x[j, ]))
+            med.init <- robustbase::covMcd(cbind(x[i, ], x[j, ]))
           }
           else {
             med.init <- list()
@@ -120,7 +120,7 @@ biwt.cor <- function (x, r = 0.2, output = "matrix", median = TRUE, full.init = 
       while (j < i) {
         if (full.init != TRUE) {
           if (median != TRUE) {
-            med.init <- covMcd(cbind(x[i, ], x[j, ]))
+            med.init <- robustbase::covMcd(cbind(x[i, ], x[j, ]))
           }
           else {
             med.init <- list()
