@@ -23,32 +23,33 @@ A list with components
 Compute a multivariate location and scale estimate based on Tukey's biweight weight function.
 }
 \examples{
-samp.data <- MASS::mvrnorm(30,mu=c(0,0),Sigma=matrix(c(1,.75,.75,1),ncol=2))
+samp_data <- MASS::mvrnorm(30,mu=c(0,0),Sigma=matrix(c(1,.75,.75,1),ncol=2))
 r <- 0.2 # breakdown
 
-samp.mcd <- robustbase::covMcd(samp.data)
-samp.bw <- biwt_est(samp.data, r, samp.mcd)
+samp_mcd <- robustbase::covMcd(samp_data)
+samp_bw <- biwt_est(samp_data, r, samp_mcd)
 
-samp.bw.var1 <- samp.bw$biwt.sig[1,1]
-samp.bw.var2 <- samp.bw$biwt.sig[2,2]
-samp.bw.cov <- samp.bw$biwt.sig[1,2]
+samp_bw_var1 <- samp_bw$biwt_sig[1,1]
+samp_bw_var2 <- samp_bw$biwt_sig[2,2]
+samp_bw_cov <- samp_bw$biwt_sig[1,2]
 
-samp.bw.corr <- samp.bw.cov / sqrt(samp.bw.var1 * samp.bw.var2)
+samp_bw_corr <- samp_bw_cov / sqrt(samp_bw_var1 * samp_bw_var2)
 
 # or:
 
-samp.bw.corr <- samp.bw$biwt.sig[1,2] / sqrt(samp.bw$biwt.sig[1,1]*samp.bw$biwt.sig[2,2])
+samp_bw_corr <- samp_bw$biwt_sig[1,2] / sqrt(samp_bw$biwt_sig[1,1]*samp_bw$biwt_sig[2,2])
+samp_bw_corr
 
 ##############
 # to speed up the calculations, use the median/mad for the initialization:
 ##############
 
-samp.init <- list()
-samp.init$cov <- diag(apply(samp.data, 2, stats::mad, na.rm=TRUE))
-samp.init$center <- apply(samp.data, 2, median, na.rm=TRUE)
+samp_init <- list()
+samp_init$cov <- diag(apply(samp_data, 2, stats::mad, na.rm=TRUE))
+samp_init$center <- apply(samp_data, 2, median, na.rm=TRUE)
 
-samp.bw <- biwt_est(samp.data, r, samp.init)
-samp.bw.corr <- samp.bw$biwt.sig[1,2] / sqrt(samp.bw$biwt.sig[1,1]*samp.bw$biwt.sig[2,2])
+samp_bw <- biwt_est(samp_data, r, samp_init)
+samp_bw_corr <- samp_bw$biwt.sig[1,2] / sqrt(samp_bw$biwt.sig[1,1]*samp_bw$biwt.sig[2,2])
 }
 \references{
 Hardin, J., Mitani, A., Hicks, L., VanKoten, B.; A Robust Measure of Correlation Between Two Genes on a Microarray, \emph{BMC Bioinformatics, 8}:220; 2007.

@@ -15,13 +15,13 @@
 #'
 #' @examples
 #'
-#' samp.data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
+#' samp_data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
 #' r <- 0.2 # breakdown
 #'
 #' # To compute the 3 pairwise correlations from the sample data:
 #'
-#' samp.bw.cor <- biwt_cor(samp.data,r)
-#' samp.bw.cor
+#' samp_bw_cor <- biwt_cor(samp_data,r)
+#' samp_bw_cor
 #' @export
 biwt_cor <- function(x, r, median=TRUE, full.init=TRUE){
 
@@ -52,10 +52,10 @@ if (full.init !=TRUE){
 	}
 
 	biwt <- biwt_est(cbind(x[,i],x[,j]),r,med.init)
-	corr <- c(corr,biwt$biwt.sig[1,2]/sqrt(biwt$biwt.sig[1,1]*biwt$biwt.sig[2,2]))
+	corr <- c(corr,biwt$biwt_sig[1,2]/sqrt(biwt$biwt_sig[1,1]*biwt$biwt_sig[2,2]))
 	NAid <- c(NAid,biwt$NAid)
 	j<-j+1
 	}
 
 	}
-return(list(biwt.corr=corr,biwt.NAid=NAid))}
+return(list(biwt_corr=corr,biwt_NAid=NAid))}

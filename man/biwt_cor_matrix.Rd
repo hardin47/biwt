@@ -25,13 +25,13 @@ Compute a multivariate location and scale estimate based on Tukey's biweight wei
 }
 \examples{
 
-samp.data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
+samp_data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
 r <- 0.2 # breakdown
 
 # To compute the 3 pairwise correlations in matrix form:
 
-samp.bw.cor.mat <- biwt_cor_matrix(samp.data,r)
-samp.bw.cor.mat
+samp_bw_cor_mat <- biwt_cor_matrix(samp_data,r)
+samp_bw_cor_mat
 }
 \references{
 Hardin, J., Mitani, A., Hicks, L., VanKoten, B.; A Robust Measure of Correlation Between Two Genes on a Microarray, \emph{BMC Bioinformatics, 8}:220; 2007.

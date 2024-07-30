@@ -25,11 +25,11 @@ A function to compute the biweight mean vector and covariance matrix
 }
 \examples{
 
-samp.data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
+samp_data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
 r <- 0.2 # breakdown
 
 # To compute the 3 pairwise correlations from the sample data:
 
-samp.bw.cor <- biwt_cor(samp.data,r)
-samp.bw.cor
+samp_bw_cor <- biwt_cor(samp_data,r)
+samp_bw_cor
 }

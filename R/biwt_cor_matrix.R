@@ -19,13 +19,13 @@
 #'
 #' @examples
 #'
-#' samp.data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
+#' samp_data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
 #' r <- 0.2 # breakdown
 #'
 #' # To compute the 3 pairwise correlations in matrix form:
 #'
-#' samp.bw.cor.mat <- biwt_cor_matrix(samp.data,r)
-#' samp.bw.cor.mat
+#' samp_bw_cor_mat <- biwt_cor_matrix(samp_data,r)
+#' samp_bw_cor_mat
 #' @export
 biwt_cor_matrix <- function(x, r, median=TRUE, full.init=TRUE){
 
@@ -56,9 +56,9 @@ if (full.init !=TRUE){
 			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=TRUE)}
 	}
 
-	biwt <- biwt_est(cbind(x[,i],x[,j]),r,med.init)
-	corr <- c(corr,biwt$biwt.sig[1,2]/sqrt(biwt$biwt.sig[1,1]*biwt$biwt.sig[2,2]))
-	NAid <- c(NAid,biwt$biwt.NAid)
+	biwt <- biwt_est(cbind(x[,i],x[,j]), r, med.init)
+	corr <- c(corr,biwt$biwt_sig[1,2]/sqrt(biwt$biwt_sig[1,1]*biwt$biwt_sig[2,2]))
+	NAid <- c(NAid,biwt$biwt_NAid)
 	j<-j+1
 	}
 
@@ -69,7 +69,7 @@ diag(corr.mat) <- 1
 
 NAid.mat <- hopach::dissmatrix(NAid)
 
-return(list(biwt.corr.mat = corr.mat, biwt.NAid.mat=NAid.mat))}
+return(list(biwt_corr_mat = corr.mat, biwt_NAid_mat=NAid.mat))}
 
 
 
