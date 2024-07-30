@@ -11,10 +11,16 @@
 #' @importFrom robustbase covMcd
 #' @importFrom stats dchisq mad mahalanobis pchisq
 #'
-#' @return returns a list consisting of:
-#' \item{biwt.corr}{a vector consisting of the lower triangle of the correlation matrix stored by columns in a vector, say bwcor. If \code{g} is the number of observations, i.e., then for \eqn{i < j \leq g}, the biweight correlation between (rows) \code{i} and \code{j} is bwcor[\code{g*(i-1) - i*(i-1)/2 + j-i}]. The length of the vector is \code{g*(g-1)/2}, i.e., of order \code{g^2}. }
-#' \item{biwt.NAid}{a vector which is indexed in the same way as \code{biwt.corr}.  The entries represent whether the biweight correlation was possible to compute (will be NA if too much data is missing or if the initializations are not accurate).  0 if computed accurately, 1 if NA.}
+#' @return Specifying "vector" for the output argument returns a vector consisting of the lower triangle of the correlation matrix stored by columns in a vector, say \eqn{bwcor}. If \eqn{g} is the number of observations and \eqn{bwcor} is the correlation vector, then for \eqn{i < j <= g}, the biweight correlation between (rows) \eqn{i} and \eqn{j} is \eqn{bwcor[(j-1)*(j-2)/2 + i]}. The length of the vector is \eqn{g*(g-1)/2}, i.e., of order \eqn{g^2}.
 #'
+#' Specifying "matrix" for the output argument returns a matrix of the biweight correlations.
+#'
+#' Specifying "distance" for the output argument returns a matrix of the biweight distances (default is 1 minus absolute value of the biweight correlation).
+#'
+#' Returns a list with components:
+#' \item{corr}{a vector consisting of the lower triangle of the correlation matrix stored by columns in a vector, say bwcor. If \code{g} is the number of observations, i.e., then for \eqn{i < j \leq g}, the biweight correlation between (rows) \code{i} and \code{j} is bwcor[\eqn{g*(i-1) - i*(i-1)/2 + j-i}]. The dimension of the matrix is \eqn{g x g}.}
+#' \item{corr.mat}{a matrix consisting of the lower triangle of the correlation matrix stored by columns in a vector, say bwcor. If \code{g} is the number of observations, i.e., then for \eqn{i < j \leq g}, the biweight correlation between (rows) \code{i} and \code{j} is bwcor[\eqn{g*(i-1) - i*(i-1)/2 + j-i}]. The length of the vector is \eqn{g*(g-1)/2}, i.e., of order \eqn{g^2}. }
+#' \item{dist.mat}{a matrix consisting of the correlations converted to distances (either 1 - correlation or 1 - abs(correlation)).}
 #' @examples
 #'
 #' samp.data <- t(MASS::mvrnorm(30,mu=c(0,0,0),
