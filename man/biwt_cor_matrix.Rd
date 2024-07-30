@@ -4,7 +4,7 @@
 \alias{biwt_cor_matrix}
 \title{A function to compute the biweight mean vector and covariance matrix}
 \usage{
-biwt_cor_matrix(x, r, median = TRUE, full.init = TRUE)
+biwt_cor_matrix(x, r, median = TRUE, full_init = TRUE)
 }
 \arguments{
 \item{x}{an \code{n x g} matrix or data frame (\code{n} is the number of measurements, \code{g} is the number of observations (genes) )}
@@ -13,12 +13,16 @@ biwt_cor_matrix(x, r, median = TRUE, full.init = TRUE)
 
 \item{median}{a logical command to determine whether the initialization is done using the coordinate-wise median and MAD (TRUE) or using the minimum covariance determinant (MCD)  (FALSE).  Using the MCD is substantially slower.}
 
-\item{full.init}{a logical command to determine whether the initialization is done for each pair separately (FALSE) or only one time at the beginning using the entire data matrix (TRUE).  Initializing for each pair separately is substantially slower.}
+\item{full_init}{a logical command to determine whether the initialization is done for each pair separately (FALSE) or only one time at the beginning using the entire data matrix (TRUE).  Initializing for each pair separately is substantially slower.}
 }
 \value{
-returns a list consisting of:
-\item{biwt.corr.matrix}{a matrix of the biweight correlations.}
-\item{biwt.NAid.matrix}{a matrix representing whether the biweight correlation was possible to compute (will be NA if too much data is missing or if the initializations are not accurate).  0 if computed accurately, 1 if NA.}
+Using \code{\link{biwt_est}} to estimate the robust covariance matrix, a robust measure of correlation is computed using Tukey's biweight M-estimator. The biweight correlation is essentially a weighted correlation where the weights are calculated based on the distance of each measurement to the data center with respect to the shape of the data.  The correlations are computed pair-by-pair because the weights should depend only on the pairwise relationship at hand and not the relationship between all the observations globally.  The biwt functions compute many pairwise correlations and create distance matrices for use in other algorithms (e.g., clustering).
+
+In order for the biweight estimates to converge, a reasonable initialization must be given. Typically, using TRUE for the median and full_init arguments will provide acceptable initializations. With particularly irregular data, the MCD should be used to give the initial estimate of center and shape. With data sets in which the observations are orders of magnitudes different, full_init=FALSE should be specified.
+
+Returns a list with components:
+\item{biwt_corr_matrix}{a matrix of the biweight correlations.}
+\item{biwt_NAid_matrix}{a matrix representing whether the biweight correlation was possible to compute (will be NA if too much data is missing or if the initializations are not accurate).  0 if computed accurately, 1 if NA.}
 }
 \description{
 Compute a multivariate location and scale estimate based on Tukey's biweight weight function.

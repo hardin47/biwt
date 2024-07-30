@@ -14,10 +14,12 @@ biwt_est(x, r, med.init)
 \item{med.init}{a (robust) initial estimate of the center and shape of the data.  form is a list with components center and cov.}
 }
 \value{
-A list with components
-\item{biwt.mu}{the final estimate of location}
-\item{biwt.sig}{the final estimate of scatter}
-\item{biwt.NAid}{a logical of whether the given initialization was used (coded as 0) or whether a more precise initialization was used (namely, the pair by pair MCD, coded as 1).}
+A robust measure of center and shape is computed using Tukey's biweight M-estimator.  The biweight estimates are essentially weighted means and covariances where the weights are calculated based on the distance of each measurement to the data center with respect to the shape of the data.  The estimates should be computed pair-by-pair because the weights should depend only on the pairwise relationship at hand and not the relationship between all the observations globally.
+
+Returns a list with components:
+\item{biwt_mu}{the final estimate of location}
+\item{biwt_sig}{the final estimate of scatter}
+\item{biwt_NAid}{a logical of whether the given initialization was used (coded as 0) or whether a more precise initialization was used (namely, the pair by pair MCD, coded as 1).}
 }
 \description{
 Compute a multivariate location and scale estimate based on Tukey's biweight weight function.
