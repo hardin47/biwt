@@ -33,6 +33,10 @@ Specifying "matrix" for the output argument returns a matrix of the biweight cor
 
 Specifying "distance" for the output argument returns a matrix of the biweight distances (default is 1 minus absolute value of the biweight correlation).
 
+If there is too much missing data or if the initialization is not accurate, the function will compute the MCD for a given pair of observations before computing the biweight correlation (regardless of the initial settings given in the call to the function).
+
+The "vector" output option is given so that correlations can be stored as vectors which are less computationally intensive than matrices.
+
 Returns a list with components:
 \item{corr}{a vector consisting of the lower triangle of the correlation matrix stored by columns in a vector, say bwcor. If \code{g} is the number of observations, i.e., then for \eqn{i < j \leq g}, the biweight correlation between (rows) \code{i} and \code{j} is bwcor[\eqn{g*(i-1) - i*(i-1)/2 + j-i}]. The dimension of the matrix is \eqn{g x g}.}
 \item{corr.mat}{a matrix consisting of the lower triangle of the correlation matrix stored by columns in a vector, say bwcor. If \code{g} is the number of observations, i.e., then for \eqn{i < j \leq g}, the biweight correlation between (rows) \code{i} and \code{j} is bwcor[\eqn{g*(i-1) - i*(i-1)/2 + j-i}]. The length of the vector is \eqn{g*(g-1)/2}, i.e., of order \eqn{g^2}. }
