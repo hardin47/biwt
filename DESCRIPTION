@@ -11,7 +11,8 @@ Depends:
 Imports:
     robustbase,
     stats,
-    MASS
+    MASS,
+    tidyverse
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyLoad: yes

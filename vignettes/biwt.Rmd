@@ -29,8 +29,6 @@ knitr::opts_chunk$set(
   dpi = 100
 )
 library(biwt)
-library(gplots)
-library(dendextend)
 library(tidyverse)
 ```
 
@@ -459,7 +457,7 @@ dend_NA <- votes_repub |>
   dist() |> 
   hclust() |> 
   as.dendrogram() |> 
-  ladderize()
+  dendextend::ladderize()
 
 color_gradient <- colorspace::diverge_hcl
 ```
@@ -550,8 +548,8 @@ bdend <- all_votes_repub |>
   usedist::dist_setNames(rownames(all_votes_repub)) |> 
   hclust(method = "complete") |> 
   as.dendrogram() |> 
-  rotate(labels(dend_NA)) |>
-  color_branches(k=4)
+  dendextend::rotate(labels(dend_NA)) |>
+  dendextend::color_branches(k=4)
 
 gplots::heatmap.2(as.matrix(all_votes_repub),
           main = "Votes for\n Republican Presidential Candidate",
@@ -581,8 +579,8 @@ edend <- votes_repub |>
   dist() |>
   hclust(method = "complete") |> 
   as.dendrogram() |>
-  rotate(labels(dend_NA)) |>
-  color_branches(k=4)
+  dendextend::rotate(labels(dend_NA)) |>
+  dendextend::color_branches(k=4)
 
 gplots::heatmap.2(as.matrix(all_votes_repub),
           main = "Votes for\n Republican Presidential Candidate",
@@ -615,8 +613,8 @@ pdend <- all_votes_repub |>
   usedist::dist_setNames(rownames(all_votes_repub)) |>
   hclust(method = "complete") |> 
   as.dendrogram() |>
-  rotate(labels(dend_NA)) |>
-  color_branches(k=4)
+  dendextend::rotate(labels(dend_NA)) |>
+  dendextend::color_branches(k=4)
 
 gplots::heatmap.2(as.matrix(all_votes_repub),
           main = "Votes for\n Republican Presidential Candidate",
