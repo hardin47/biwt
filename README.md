@@ -6,18 +6,20 @@ The `biwt` package includes a base function to compute multivariate location, sc
 
 
 
-In its current state, the main functions in this package are:
+The primary functions in the **biwt** package are:
 
-- `biwt.cor`,
-- `biwt.cor.matrix`,
-- `biwt.dist.matrix`, and
-- `biwt.est`.
+- `biwt.est`
+- `biwt_est`
+- `biwt.cor`
+- `biwt_cor`
+- `biwt_cor_matrix`
+- `biwt_dist_matrix`
 
 ### Installation
 
 Running the following lines of code in `R` will install this package from Github:
 
-```{r}
+```
 library(devtools)
 devtools::install_github(repo = "hardin47/biwt")
 ```  
@@ -25,7 +27,7 @@ devtools::install_github(repo = "hardin47/biwt")
 ### Instructions
 See `documentation.pdf` for information on how to use this package. A portion of the example given in the documentation is reproduced below for convenience.
 
-```{r}
+```
 set.seed(4747)
 samp.data <- MASS::mvrnorm(30, mu=c(0,0,0),
                            Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1), 

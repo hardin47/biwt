@@ -535,7 +535,10 @@ dist.repub <- all_votes_repub |>
 To expand on the dendrogram, we add heatmaps to help visualize the similarities and differences among states.
 Each color cell represents the observed value given in the dataset (proportion of votes for the Republican candidate).
 As shown in the key, the bluer a box is, the fewer votes the republican candidate received.
-One note is that it is important to note that this does not mean the rest of the votes were given to the democrat candidate because there were still votes for the Green Party and write ins.
+One note is that it is important to note that this does not mean the rest of the votes were given to the democrat candidate because there were still votes cast, for example, for the Green Party candidate and write-in candidates.
+
+The heatmap examples were heavily inspired by the [https://cran.r-project.org/web/packages/dendextend/vignettes/Cluster_Analysis.html](Cluster Analysis vignette) for the [**dendextend** R package](https://cran.r-project.org/web/packages/dendextend/vignettes/dendextend.html).
+
 
 ### Biweight Heatmap
 
