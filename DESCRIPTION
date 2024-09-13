@@ -17,7 +17,12 @@ Imports:
     purrr,
     tidyr,
     readr,
-    gt
+    gt,
+    dendextend,
+    colorspace,
+    cluster,
+    usedist,
+    gplots
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyLoad: yes
