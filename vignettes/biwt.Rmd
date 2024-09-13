@@ -1,13 +1,12 @@
 ---
-title: "Resistant correlations and clustering with the **biwt** package"
+title: "Resistant correlations and clustering with the biwt package"
 author: "Frances Heitkemper, Justine Ouellette, and Johanna Hardin"
 date: September 2024
 output: 
   rmarkdown::html_vignette:
     code_folding: hide
-    toc: true
 vignette: >
-  %\VignetteIndexEntry{Resistant correlations and clustering with the **biwt** package}
+  %\VignetteIndexEntry{Resistant correlations and clustering with the biwt package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 execute:
@@ -17,7 +16,7 @@ execute:
 
 <!--
 vignette: >
-  %\VignetteIndexEntry{Resistant correlations and clustering with the **biwt** package}
+  %\VignetteIndexEntry{Resistant correlations and clustering with the biwt package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 --> 
@@ -27,8 +26,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.align = "center",
-  fig.width = 5,
-  dpi = 75
+  dpi = 100
 )
 library(biwt)
 library(colorspace)
