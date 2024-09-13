@@ -30,6 +30,10 @@ Returns a list with components:
 Compute a multivariate location and scale estimate based on Tukey's biweight weight function.
 }
 \examples{
+
+# note that biwt_dist_matrix() takes data that is nxg where the
+# goal is to find distances between each of the g items
+
 samp_data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
 r <- 0.2 # breakdown
 

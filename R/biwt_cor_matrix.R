@@ -18,10 +18,12 @@
 #'
 #' @importFrom robustbase covMcd
 #' @importFrom MASS mvrnorm
-#' @importFrom hopach dissmatrix
 #' @importFrom stats dchisq mad mahalanobis pchisq
 #'
 #' @examples
+#'
+#' # note that biwt_cor_matrix() takes data that is nxg where the
+#' # goal is to find correlations between each of the g items
 #'
 #' samp_data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
 #' r <- 0.2 # breakdown
@@ -31,50 +33,56 @@
 #' samp_bw_cor_mat <- biwt_cor_matrix(samp_data,r)
 #' samp_bw_cor_mat
 #' @export
-biwt_cor_matrix <- function(x, r, median=TRUE, full_init=TRUE){
+biwt_cor_matrix <- function(x,
+                            r,
+                            median = TRUE,
+                            full_init = TRUE) {
+  if (full_init == TRUE) {
+    if (median != TRUE) {
+      med.init <- robustbase::covMcd(x)
+    }
+    else	{
+      med.init <- list()
+      med.init$cov <- diag(1, 2) * median(apply(x, 1, stats::mad, na.rm =
+                                                  TRUE))
+      med.init$center <- c(1, 1) * median(apply(x, 1, median, na.rm = TRUE))
+    }
+  }
+
+  corr <- c()
+  NAid <- c()
+  g <- dim(x)[2]
 
 
-if (full_init==TRUE){
+  for (i in 1:g) {
+    j <- 1
+    while (j < i) {
+      if (full_init != TRUE) {
+        if (median != TRUE) {
+          med.init <- robustbase::covMcd(cbind(x[, i], x[, j]))
+        }
+        else		{
+          med.init <- list()
+          med.init$cov <- diag(1, 2) * apply(cbind(x[, i], x[, j]), 2, stats::mad, na.rm =
+                                               TRUE)
+          med.init$center <- apply(cbind(x[, i], x[, j]), 2, median, na.rm =
+                                     TRUE)
+        }
+      }
 
-	if(median!=TRUE){med.init <- robustbase::covMcd(x)}
-	else	{med.init<-list()
-		med.init$cov<-diag(1,2)*median(apply(x,1,stats::mad,na.rm=TRUE))
-		med.init$center<-c(1,1)*median(apply(x,1,median,na.rm=TRUE))
-		}
-	}
+      biwt <- biwt_est(cbind(x[, i], x[, j]), r, med.init)
+      corr <- c(corr,
+                biwt$biwt_sig[1, 2] / sqrt(biwt$biwt_sig[1, 1] * biwt$biwt_sig[2, 2]))
+      NAid <- c(NAid, biwt$biwt_NAid)
+      j <- j + 1
+    }
 
-	corr <- c()
-	NAid <- c()
-	g <- dim(x)[2]
+  }
 
+  corr.mat <- vect2diss_hop(corr)
+  diag(corr.mat) <- 1
 
-for(i in 1:g){
-	j <- 1
-	while(j < i){
+  NAid.mat <- vect2diss_hop(NAid)
 
-if (full_init !=TRUE){
-
-	if (median!=TRUE) {med.init<-robustbase::covMcd(cbind(x[,i],x[,j]))}
-	else		{med.init<-list()
-			med.init$cov <- diag(1,2)*apply(cbind(x[,i],x[,j]),2,stats::mad,na.rm=TRUE)
-			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=TRUE)}
-	}
-
-	biwt <- biwt_est(cbind(x[,i],x[,j]), r, med.init)
-	corr <- c(corr,biwt$biwt_sig[1,2]/sqrt(biwt$biwt_sig[1,1]*biwt$biwt_sig[2,2]))
-	NAid <- c(NAid,biwt$biwt_NAid)
-	j<-j+1
-	}
-
-	}
-
-corr.mat <- hopach::dissmatrix(corr)
-diag(corr.mat) <- 1
-
-NAid.mat <- hopach::dissmatrix(NAid)
-
-return(list(biwt_corr_mat = corr.mat, biwt_NAid_mat=NAid.mat))}
-
-
-
-
+  return(list(biwt_corr_mat = corr.mat, biwt_NAid_mat = NAid.mat))
+}

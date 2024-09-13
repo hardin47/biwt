@@ -25,6 +25,10 @@ Returns a list with components:
 Compute a multivariate location and scale estimate based on Tukey's biweight weight function.
 }
 \examples{
+
+# note that biwt_est() takes data that is nx2 where the
+# goal is to find the correlation between the 2 items
+
 samp_data <- MASS::mvrnorm(30,mu=c(0,0),Sigma=matrix(c(1,.75,.75,1),ncol=2))
 r <- 0.2 # breakdown
 

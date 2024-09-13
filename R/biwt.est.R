@@ -16,6 +16,10 @@
 #' @importFrom stats dchisq mad mahalanobis pchisq
 #'
 #' @examples
+#'
+#' # note that biwt.est() takes data that is 2xn where the
+#' # goal is to find the correlation between the 2 items
+#'
 #' samp.data <- t(MASS::mvrnorm(30,mu=c(0,0),
 #'                Sigma=matrix(c(1,.75,.75,1),ncol=2)))
 #'
@@ -47,7 +51,9 @@
 #' samp.bw.cor <- samp.bw$biwt.sig[1,2] / sqrt(samp.bw$biwt.sig[1,1]*samp.bw$biwt.sig[2,2])
 #' samp.bw.cor
 #' @export
-biwt.est <- function (x, r = 0.2, med.init = robustbase::covMcd(x))
+biwt.est <- function (x,
+                      r = 0.2,
+                      med.init = robustbase::covMcd(x))
 {
   p <- 2
   n <- dim(x)[2]
@@ -65,18 +71,18 @@ biwt.est <- function (x, r = 0.2, med.init = robustbase::covMcd(x))
   crit <- 100
   iter <- 1
   while (crit > eps & iter < 100) {
-    d <- d/k
-    biwt.mu <- apply(wtbw(d, c1) * x, 2, sum, na.rm = TRUE)/
+    d <- d / k
+    biwt.mu <- apply(wtbw(d, c1) * x, 2, sum, na.rm = TRUE) /
       sum(wtbw(d, c1), na.rm = TRUE)
     cent <- array(dim = c(n, p, p))
     for (i in 1:n) {
       cent[i, , ] <- (x[i, ] - biwt.mu) %*% t(x[i, ] - biwt.mu)
     }
-    biwt.sig <- apply(cent * wtbw(d, c1), c(2, 3), sum, na.rm = TRUE)/
+    biwt.sig <- apply(cent * wtbw(d, c1), c(2, 3), sum, na.rm = TRUE) /
       sum(vbw(d, c1), na.rm = TRUE)
     d2 <- sqrt(mahalanobis(x, biwt.mu, biwt.sig))
     k <- ksolve(d2, p, c1, b0)
-    crit <- max(abs(d - (d2/k)), na.rm = TRUE)
+    crit <- max(abs(d - (d2 / k)), na.rm = TRUE)
     d <- d2
     iter <- iter + 1
   }

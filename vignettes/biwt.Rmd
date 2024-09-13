@@ -1,27 +1,638 @@
 ---
-title: "biwt"
-output: rmarkdown::html_vignette
+title: "Resistant correlations and clustering with the **biwt** package"
+author: "Frances Heitkemper, Justine Ouellette, and Johanna Hardin"
+date: September 2024
+output: 
+  rmarkdown::html_vignette:
+    code_folding: hide
+    toc: true
 vignette: >
-  %\VignetteIndexEntry{biwt}
+  %\VignetteIndexEntry{Resistant correlations and clustering with the **biwt** package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+execute:
+  warning: false
+  message: false
 ---
+
+<!--
+vignette: >
+  %\VignetteIndexEntry{Resistant correlations and clustering with the **biwt** package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+--> 
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 5,
+  dpi = 75
 )
-```
-
-```{r setup}
 library(biwt)
+library(colorspace)
+library(gplots)
+library(dendextend)
+library(tidyverse)
+```
+
+# Introduction
+
+The vignette walks the reader through calculating resistant multivariate estimates and correlations. The methods are applied to presidential election data from 1856 through 2020 to uncover voting patterns.
+
+The functions in the **biwt** package are based on the following published work: Hardin, J., Mitani, A., Hicks, L., VanKoten, B.; **A Robust Measure of Correlation Between Two Genes on a Microarray**, *BMC Bioinformatics*, 8:220; 2007.
+
+
+
+# **biwt** package functions
+
+## Functions for resistant estimation
+
+We start by providing the two functions that return the resistant mean and covariance values from Tukey's biweight estimation. Note that the difference between the two functions is the `biwt.est()` requires a $2 \times n$ matrix or data frame (n is the number of measurements) and `biwt_est()` requires an $n \times 2$ matrix or data frame (n is the number of observations).
+
+### `biwt.est()`
+#### `biwt.est(x, r = 0.2, med.init = covMcd(x))`
+The function inputs a $2 \times n$ matrix, breakdown (percent of data that can be ignored), and initial estimate of the center and shape of the data.
+It outputs the measure of the center and shape of the data using Tukey's biweight M-estimator.
+
+### `biwt_est()`
+#### `biwt_est(x, r, med.init)`
+The function inputs the same arguments as `biwt.est()`, but the data input is transposed.
+That is, the input matrix is $n \times 2.$ The output is the same as `biwt.est()`.
+
+## Functions for resistant correlation
+
+Based on Tukey's biweight estimation, `biwt.cor()` and `biwt_cor()` provide resistant estimates of correlation.  Note that the difference between the two functions is that `biwt.cor()` requires a $g \times n$ matrix or data frame (n is the number of measurements, g is the number of observations (genes)) and `biwt_cor()` requires an $n \times g$ matrix or data frame (n is the number of measurements, g is the number of observations (genes)).
+
+### `biwt.cor()`
+#### `biwt.cor(x, r = 0.2, output = "matrix", median = TRUE, full.init = TRUE, absval = TRUE)`
+The function inputs a $g \times n$ matrix, the breakdown, intended output, a command to determine whether the initialization is done using the coordinate-wise median and MAD or using the minimum covariance determinant (MCD), a argument to determine whether the initialization is done for each pair separately, and an argument to determine whether [if the output is a distance] the distance should be measured as 1 minus the absolute value of the correlation or as 1 minus the correlation.
+The output is a matrix, vector, or distance, depending on the `output` argument.
+
+### `biwt_cor()`
+#### `biwt_cor(x, r, median = TRUE, full.init = TRUE)`
+The function inputs an $n \times g$ matrix, the breakdown, an argument to determine whether the initialization is done using the coordinate-wise median and MAD or using the minimum covariance determinant (MCD), and an argument to determine whether the initialization is done for each pair separately.
+The function outputs a vector of $\choose{g,2}$ biweight correlations.
+
+### `biwt_cor_matrix()`
+#### `biwt_cor_matrix(x, r, median = TRUE, full.init = TRUE)`
+The function inputs an $n \times g$ matrix, the breakdown, an argument to determine whether the initialization is done using the coordinate-wise median and MAD or using the minimum covariance determinant (MCD), and an argument to determine whether the initialization is done for each pair separately or only one time at the beginning using the entire data matrix.
+The function outputs a $g \times g$ matrix of biweight correlations.
+
+### `biwt_dist_matrix()`
+#### `biwt_dist_matrix(x, r, median = TRUE, full.init = TRUE, absval = TRUE)`
+The function inputs an $n \times g$ matrix, the breakdown, an argument to determine whether the initialization is done using the coordinate-wise median and MAD or using the minimum covariance determinant (MCD), an argument to determine whether the initialization is done for each pair separately, and an argument to determine whether the distance should be measured as 1 minus the absolute value of the correlation or as 1 minus the raw correlation.
+The function outputs a $g \times g$ matrix of biweight **distances** (either 1 - correlation or 1 - absolute correlation).
+
+# Correlation
+
+The goal of the functions in the **biwt** package are to produce correlations which are resistant to rogue data.
+
+> A *resistant* method produces results that change only slightly when a small part of the data is replaced by new numbers, possibly very different fromt he original ones. [Hoaglin, Mosteller, Tukey, **Understanding Robust and Exploratory Data Analysis**, pg 2. 1983]
+
+For example, the median is a resistant measure of center because even if some data values are replaced with extreme values, the median will remain roughly the same since it is the middle number.
+However, if 50% of the data are changed, the median's value will change.
+The mean is not a resistant measure of center.
+If observations are replaced with extreme values, the mean will be drawn to those values.
+
+Tukey's biweight gives zero weight to observations that are sufficiently far from the bulk of the data, thus discounting them in the calculation of the center, the shape, and the correlation.
+
+## Biweight Correlation
+
+Biweight correlation is a resistant correlation method used to find accurate correlation of multivariate data in the presence of outliers.
+The biweight correlation functions are set (default) to be resistant for an outlier proportion of up to 20%.
+Sufficiently far out outlying points will be given zero weight, and the correlation is calculated without those observations, yielding a correlation which is resistant to extreme values.
+
+## Pearson Correlation 
+
+Unlike Tukey's biweight correlation, the Pearson correlation is calculated with all observations, each getting equal weight.
+Therefore, the Pearson correlation is not resistant because extreme value can have a large impact on the correlation calculation.
+
+## Comparison of Biweight and Pearson correlation on clean data
+When the data are clean, meaning no outliers, both correlation functions are able to accurately estimate the true population correlation using a sample.
+It is also known that Pearson correlation is the maximum likelihood estimator of the true correlation in uncontaminated bivariate normal populations (a quality that brings many nice properties).
+
+We start with clean data (no contamination) and display that for a single sample, the estimated correlation values are close to the true parameter of 0.75.
+Additionally, we show an example of a single sample generated from a bivariate normal distribution with correlation parameter of 0.75.
+
+```{r}
+set.seed(4747)
+# The `contamination` function generates a dataset with `p` percent
+# contaminated data.
+# `n`: number of observations
+# `p`: percent of contaminated observations
+# `pc`: correlation of the population from which the data are generated
+# `u1x`: lower bound of uniform dist on x-axis (contaminated data)
+# `u2x`: upper bound of uniform dist on x-axis (contaminated data)
+# `u1y`: lower bound of uniform dist on y-axis (contaminated data)
+# `u2y`: upper bound of uniform dist on y-axis (contaminated data)
+contamination <- function(n = 100, p = 0.1, pc = 0.75, 
+                          u1x = -3, u2x = -1, u1y = 15, u2y = 25){
+    temp2 <- rbind(data.frame(MASS::mvrnorm(n*(1-p), mu = c(0,0), 
+                          Sigma = matrix(c(1,pc,pc,1), ncol= 2))), 
+               cbind(X1 = runif(n*p, u1x, u2x), X2 = runif(n*p, u1y, u2y)))
+    return(data = temp2)
+}
+
+
+# The `correlation_func` function simulates contaminated data
+# and returns both the biweight and the Pearson correlation
+# `r`: the breakdown (% of allowed contamination)
+correlation_func <- function(r = 0.2, n = 100, p = 0.1, pc = 0.75, 
+                             u1x = -3, u2x = -1, u1y = 15, u2y = 25){
+  
+  samp_data <- contamination(n = n, p = p, pc = pc, 
+                             u1x = u1x, u2x = u2x, u1y = u1y, u2y = u2y)
+
+  return(data.frame(bwcorrelation = biwt_cor(samp_data, r)$biwt_corr, 
+                    pcorrelation = cor(samp_data)[1,2]))
+
+}
+
+# First, run the correlation function on clean (uncontaminated) data
+correlation_func(p = 0) |> 
+  gt::gt(caption = "Biweight and Pearson correlations from a sample of 100 observations in an uncontaminated bivariate normal distribution with population correlation of 0.75.") |> 
+  gt::cols_label(bwcorrelation = "biweight correlation", 
+             pcorrelation = "Pearson correlation") |> 
+  gt::tab_options(table.width = gt::pct(85))
+```
+
+```{r fig.cap = "Plot of uncontaminated bivariate normal sample of size 100 from a population with true correlation of 0.75."}
+contamination(n = 100, p = 0, pc = 0.75, u1x = -3, u2x = -1, u1y = 15, u2y = 25) |>   
+  ggplot() +
+  geom_point(aes(x = X1, y = X2)) + 
+  labs(x = "first coordinant",
+       y = "second coordinant",
+       title = "Uncontaminated dataset") + 
+  theme_minimal()
 ```
 
 
-# What is the biweight?
+## Comparison of Biweight and Pearson correlation on contaminated data
+When the data are contaminated, the biweight correlation is able to estimate the underlying population correlation more accurately than the Pearson correlation does.
+The biweight down weights the contaminated data and calculates the correlation on the remaining uncontaminated values.
 
-# How to use the biweight correlation
+In the example below, 10% of the data are replaced with contamination which is distributed uniformly in the $x$ direction from -3 to -1 and uniformly in the $y$ direction from 15 to 25.
+We provide the correlation values (both biweight and Pearson) on the contaminated data and note that the biweight value is much closer to the population parameter (0.75) than the Pearson correlation is.
+Additionally, we show an example of a single sample generated from a contaminated (10% of observations) bivariate normal distribution with correlation parameter of 0.75.
 
-# The biweight correlation on Cauchy data
+```{r}
+# using the default values
+correlation_func(r = 0.2, n = 100, p = 0.1, pc = 0.75,
+                 u1x = -3, u2x = -1, u1y = 15, u2y = 25)|> 
+  gt::gt(caption = "Biweight and Pearson correlations from a sample of 100 observations in a 10% contaminated bivariate normal distribution with population correlation of 0.75.") |> 
+  gt::cols_label(bwcorrelation = "biweight correlation", 
+             pcorrelation = "Pearson correlation") |> 
+  gt::tab_options(table.width = gt::pct(85))
+```
+
+```{r fig.cap = "Plot of 10% contaminated bivariate normal sample of size 100 from a population with true correlation of 0.75."}
+
+# using the default values
+contamination(n = 100, p = 0.1, pc = 0.75, 
+              u1x = -3, u2x = -1, u1y = 15, u2y = 25) |> 
+  ggplot() +
+  geom_point(aes(x = X1, y = X2)) + 
+  labs(x = "first coordinant",
+       y = "second coordinant",
+       title = "Dataset with 10% contamination") + 
+  theme_minimal()
+```
+
+# Simulation Study
+
+In the following simulation study, we investigate different contamination levels and assess the resulting biweight and Pearson correlations.  
+
+### Example #1: breakdown > contamination, 20% compressed contamination
+When the breakdown (r = 0.3) is greater than the percentage of contamination (p = 0.2), then the contaminated data is down weighted during the biweight correlation computation. 
+The result is that the biweight correlation estimates are more accurate than the Pearson correlation estimates.
+
+```{r fig.cap = "One simulated dataset with n = 100, 20% compressed contamination, and a population correlation of 0.75."}
+data1 <- contamination(n = 100, p = 0.2, pc = 0.75, 
+                      u1x = -3, u2x = -1, u1y = 15, u2y = 25)
+
+data1 |>
+  ggplot() +
+  geom_point(aes(x = X1, y = X2)) + 
+  labs(x = "first coordinant",
+       y = "second coordinant",
+       title = "Dataset with 20% compressed contamination") + 
+  theme_minimal()
+```
+
+```{r fig.cap = "Histogram of correlations for 500 random samples.  Each of the 500 datasets has n = 100 and 20% compressed contamination. The pink vertical line is at the population correlation, 0.75."}
+correlation1 <- 1:500 |> 
+  map_dfr(~correlation_func(r = 0.3, n = 100, p = 0.2, pc = 0.75, 
+                            u1x = -3, u2x = -1, u1y = 15, u2y = 25))
+
+correlation_long1 <- correlation1 |>
+  pivot_longer(cols = c ("bwcorrelation", "pcorrelation"), 
+               names_to = "statistic", values_to = "value")
+
+correlation_long1 |>
+  mutate(statistic = case_when(
+    statistic == "bwcorrelation" ~ "biweight correlation",
+    statistic == "pcorrelation" ~ "Pearson correlation"
+  )) |> 
+  ggplot(aes(x = value)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = 0.75, color = "pink") + 
+  facet_wrap(~statistic) + 
+  theme_minimal() +
+  labs(x = "correlation value", y = "")
+```
+
+```{r fig.cap = "Scatterplot describing the biweight and Pearson correlations calculated for each of 500 contaminated datasets. The pink vertical and horizontal lines are at the population correlation, 0.75."}
+correlation1 |>
+  ggplot(aes()) +
+  geom_point(aes(x = bwcorrelation, y = pcorrelation)) +
+  geom_vline(xintercept = 0.75, color = "pink") + 
+  geom_hline(yintercept = 0.75, color = "pink") + 
+  theme_minimal() +
+  labs(x = "biweight correlation",
+       y = "Pearson correlation",
+       title = "biweight and Pearson correlation for each \nof 500 simulated datasets")
+```
+
+### Example #2: breakdown > contamination, 20% diffuse contamination
+
+By changing the range from which the outlying contamination comes from, we can see the impact that contamination has on both the biweight and the Pearson correlations.
+Despite the contamination being quite diffuse, the biweight is able to estimate the correlation to be close to the true value of 0.75.
+Note that we would expect the biweight correlation to be accurate because the percentage of contamination is less than the breakdown.
+The Pearson correlation does better on the diffuse correlation than on the compressed correlation, but the Pearson estimates are still not close to the true value of 0.75. The compressed contamination provided Pearson correlation estimates close to -0.5, while the diffuse contamination Pearson correlation estimates are centered roughly around zero.
+
+
+```{r fig.cap = "One simulated dataset with n = 100, 20% diffuse contamination, and a population correlation of 0.75."}
+data2 <- contamination(n = 100, p = 0.2, pc = 0.75, 
+                       u1x = -10, u2x = 10, u1y = -10, u2y = 10)
+
+data2 |>
+  ggplot() +
+  geom_point(aes(x = X1, y = X2)) + 
+  labs(x = "first coordinant",
+       y = "second coordinant",
+       title = "Dataset with 20% diffuse contamination") + 
+  theme_minimal()
+```
+
+```{r fig.cap = "Histogram of correlations for 500 random samples.  Each of the 500 datasets has n = 100 and 20% diffuse contamination. The pink vertical line is at the population correlation, 0.75."}
+correlation2 <- 1:500 |> 
+  map_dfr(~correlation_func(r = 0.3, n = 100, p = 0.2, pc = 0.75, 
+                            u1x = -10, u2x = 10, u1y = -10, u2y = 10))
+
+correlation_long2 <- correlation2 |>
+  pivot_longer(cols = c("bwcorrelation", "pcorrelation"), 
+               names_to = "statistic", values_to = "val")
+
+correlation_long2 |>
+  mutate(statistic = case_when(
+    statistic == "bwcorrelation" ~ "biweight correlation",
+    statistic == "pcorrelation" ~ "Pearson correlation"
+  )) |> 
+  ggplot(aes(x = val)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = 0.75, color = "pink") + 
+  facet_wrap(~statistic) + 
+  theme_minimal() +
+  labs(x = "correlation value", y = "")
+```
+
+```{r fig.cap = "Scatterplot describing the biweight and Pearson correlations calculated for each of 500 20% diffuse contaminated datasets. The pink vertical and horizontal lines are at the population correlation, 0.75."}
+
+correlation2 |>
+  ggplot(aes()) +
+  geom_point(aes(x = bwcorrelation, y = pcorrelation)) +
+  geom_vline(xintercept = 0.75, color = "pink") + 
+  geom_hline(yintercept = 0.75, color = "pink") + 
+  theme_minimal() +
+  labs(x = "biweight correlation",
+       y = "Pearson correlation",
+       title = "biweight and Pearson correlation for each \nof 500 simulated datasets")
+```
+
+### Example #3: breakdown < contamination, 40% compressed contamination
+
+The next example retains the parameters from Example #1 with one change.
+The proportion of contamination is increased to 40%.  Recall that the breakdown is set at 30%, so the contamination is higher than the breakdown.
+Given that the contamination is higher than the breakdown, the biweight is no longer able to estimate the correlation close to the true parameter of 0.75.
+The biweight is set to consider (i.e., downweight) no more than 30% of the observations as outlying, and so 40% contamination sets the some of the contamination to be part of the bulk of the observations.
+As with other contamination values, the Pearson correlation is unable to accurately estimate the true parameter of 0.75.
+
+```{r fig.cap = "One simulated dataset with n = 100, 40% compressed contamination, and a population correlation of 0.75."}
+data3 <- contamination(n = 100, p = .4, pc = 0.75, 
+                       u1x = -3, u2x = -1, u1y = 15, u2y = 25)
+
+data3 |>
+  ggplot() +
+  geom_point(aes(x = X1, y = X2)) + 
+  labs(x = "first coordinant",
+       y = "second coordinant",
+       title = "Dataset with 40% compressed contamination") + 
+  theme_minimal()
+```
+
+```{r fig.cap = "Histogram of correlations for 500 random samples.  Each of the 500 datasets has n = 100 and 40% compressed contamination. The pink vertical line is at the population correlation, 0.75."}
+correlation3 <- 1:500 |> 
+  map_dfr(~correlation_func(r = 0.3, n = 100, p = .4, pc = 0.75, 
+                            u1x = -3, u2x = -1, u1y = 15, u2y = 25))
+
+correlation_long3 <- correlation3 |>
+  pivot_longer(cols = c("bwcorrelation", "pcorrelation"), 
+               names_to = "statistic", values_to = "value")
+
+correlation_long3 |>
+  mutate(statistic = case_when(
+    statistic == "bwcorrelation" ~ "biweight correlation",
+    statistic == "pcorrelation" ~ "Pearson correlation"
+  )) |> 
+  ggplot(aes(x = value)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = 0.75, color = "pink") + 
+  facet_wrap(~statistic) + 
+  theme_minimal() +
+  labs(x = "correlation value", y = "")
+```
+
+```{r fig.cap = "Scatterplot describing the biweight and Pearson correlations calculated for each of 500 40% compressed contaminated datasets. The pink vertical and horizontal lines are at the population correlation, 0.75."}
+
+correlation3 |>
+  ggplot(aes()) +
+  geom_point(aes(x = bwcorrelation, y = pcorrelation)) +
+  geom_vline(xintercept = 0.75, color = "pink") + 
+  geom_hline(yintercept = 0.75, color = "pink") + 
+  theme_minimal() +
+  labs(x = "biweight correlation",
+       y = "Pearson correlation",
+       title = "biweight and Pearson correlation for each \nof 500 simulated datasets")
+```
+
+### Example #4: low population correlation parameter of 0.1, 20% compressed contamination
+
+One last change allows to further compare the biweight and Pearson correlations.
+Again, all parameter settings are the same from Example #1 with one change.
+The true population correlation is set to 0.1 (a much weaker correlation).
+We see that the value of the population correlation does not have a strong effect on the ability of the biweight to estimate the correlation well and the Pearson to estmate the correlation poorly.
+The results in Example #4 are quite similar to the results in Example #1.
+
+```{r fig.cap = "One simulated dataset with n = 100, 20% compressed contamination, and a population correlation of 0.1."}
+data4 <- contamination(n = 100, p = 0.2, pc = 0.1, 
+                       u1x = -3, u2x = -1, u1y = 15, u2y = 25)
+
+data4 |>
+  ggplot() +
+  geom_point(aes(x = X1, y = X2)) + 
+  labs(x = "first coordinant",
+       y = "second coordinant",
+       title = "Dataset with 20% compressed contamination") + 
+  theme_minimal()
+```
+
+```{r fig.cap = "Histogram of correlations for 500 random samples.  Each of the 500 datasets has n = 100 and 20% compressed contamination. The pink vertical line is at the population correlation, 0.1."}
+
+correlation4 <- 1:500 |> 
+  map_dfr(~correlation_func(r = 0.3, n = 100, p = 0.2, pc = 0.1, 
+                            u1x = -3, u2x = -1, u1y = 15, u2y = 25))
+
+correlation_long4 <- correlation4 |>
+  pivot_longer(cols = c ("bwcorrelation", "pcorrelation"), names_to = "statistic", values_to = "value")
+
+correlation_long4 |>
+  mutate(statistic = case_when(
+    statistic == "bwcorrelation" ~ "biweight correlation",
+    statistic == "pcorrelation" ~ "Pearson correlation"
+  )) |> 
+  ggplot(aes(x = value)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = 0.1, color = "pink") + 
+  facet_wrap(~statistic) + 
+  theme_minimal() +
+  labs(x = "correlation value", y = "")
+```
+
+```{r fig.cap = "Scatterplot describing the biweight and Pearson correlations calculated for each of 500 contaminated datasets. The pink vertical and horizontal lines are at the population correlation, 0.1."}
+
+correlation4 |>
+  ggplot(aes()) +
+  geom_point(aes(x = bwcorrelation, y = pcorrelation)) +
+  geom_vline(xintercept = 0.1, color = "pink") + 
+  geom_hline(yintercept = 0.1, color = "pink") + 
+  theme_minimal() +
+  labs(x = "biweight correlation",
+       y = "Pearson correlation",
+       title = "biweight and Pearson correlation for each \nof 500 simulated datasets")
+```
+
+
+
+
+# Presidential Candidate Voting Data
+
+The following clustering example models data on every US presidential election between 1856 and 2020.
+Each row of the dataset is one of the 50 united states.
+Each column represents the percentage of votes for the Republican candidate in the election, over each of the 42 elections from 1856 to 2020.
+Note that we are looking to cluster the states, i.e., the rows (using information from the years = columns).
+To that end, the main **biwt** R package functions to be used is `biwt.cor()`.
+
+The data from 1856-1972 are provided in the **cluster** R package (available on CRAN) with the dataset name `votes.repub`.
+The data from `1976-2020` are found at [Harvard Dataverse, US President 1976-2020](https://doi.org/10.7910/DVN/42MVDX).
+The second dataset has a CC0 1.0 Universal license, and is included in the **biwt** R package as part of the vignette.
+
+
+```{r}
+# combining the two datasets and creating 
+# a single data frame with the relevant information
+votes_repub <- cluster::votes.repub
+
+newer_president <- read_csv("data/1976-2020-president.csv") |> 
+  mutate(percent = candidatevotes / totalvotes * 100) |> 
+  filter(party_detailed == "REPUBLICAN" & !writein) |> 
+  filter(state != "DISTRICT OF COLUMBIA") |> 
+  dplyr::select(year, state, percent) |> 
+  pivot_wider(id_cols = state, names_from = year, values_from = percent)
+
+all_votes_repub <- cbind(votes_repub, newer_president) |> 
+  dplyr::select(-state, -X1976) 
+years <- as.numeric(gsub("X", "", colnames(all_votes_repub)))
+
+# For states that did not exist or vote during certain years
+# (i.e. Alaska and Hawaii), the NA data is ignored.
+dend_NA <- votes_repub |> 
+  is.na() |>
+  dist() |> 
+  hclust() |> 
+  as.dendrogram() |> 
+  ladderize()
+
+color_gradient <- colorspace::diverge_hcl
+```
+
+## Dendrograms
+
+Dendrograms are a visualization of a hierarchical clustering analysis.
+The hierarchical clustering agglomerates observations (here, states) one at a time based on which states are closest to one another.
+The dendrogram displays the entire agglomeration algorithm with shorter vertical bars indicating states (or groups of states) that are closest to one another and longer vertical bars indicating states (or groups of states) that are farther from one another.
+In our work we use complete linkage.
+The result is to identify which states had similar voting patterns (measured by percent of Republican vote) across almost 200 years of presidential races.
+
+The biweight correlation distance measure is the metric which seems to cluster the states in a way that is most similar to how the politics across states is considered.
+That is, the biweight correlation distance was the best model option.
+
+### Biweight dendrogram
+
+The biweight correlation distance (between two states) is calculated as one minus the biweight correlation between those two states.
+We can observe that there are two quite distinct groups of states: the states in the first arm (left side) are primarily states that are now considered left leaning or "blue"; the states in the second arm (right side) are primarily stats that are now considered right leaning or "red."
+The biweight distance measure does an excellent job of distinguishing between the two groups of states.
+
+```{r fig.width = 9, fig.height = 5}
+dist.repub <- all_votes_repub |> 
+  biwt.cor(r = 0.2, absval = FALSE, output = "distance") |>
+  as.dist() |>
+  usedist::dist_setNames(rownames(votes_repub)) |>
+  hclust(method = "complete") |> 
+  as.dendrogram() |>
+  plot(ylab = "biweigtht correlation distance")
+```
+
+### Euclidean dendrogram
+
+Euclidean distance is calculated using the Euclidean distance of the Republican voting shares from 1856 to 2020.
+There are not clear distinctions in the dendrogram to identify groups of states which are most similar.
+In breaking the states up into clusters, 2 groups would produce almost all states in the same cluster (except MS, SC, FL, AK, TX, LA, AL, and GA).
+While the smaller of the two clusters might be meaningfully related, it seems as though linking the other 42 states might be too broad.
+However, how to break the dendrogram into additional cluster (3 clusters? 4 clusters? 5 clusters?) is not an obvious task.
+
+```{r fig.width = 9, fig.height = 5}
+dist.repub <- all_votes_repub |> 
+  dist()|>
+  hclust(method = "complete") |> 
+  as.dendrogram() |>
+  plot(ylab = "Euclidean distance")
+```
+
+### Pearson dendrogram
+
+The Pearson distance (between two states) is calculated as one minus the Pearson correlation between those two states.
+Again, like the Euclidean distance dendrogram, there are not obvious cutoff values to determine the best number of clusters.
+Possibly, there could be 6 or 7 clusters, but the groupings do not necessarily align with current understanding of political alignment across states.
+
+```{r fig.width = 9, fig.height = 5}
+pcor_dist <- function(data){
+  1 - abs(cor(t(data), use = "pairwise.complete.obs"))
+}
+
+dist.repub <- all_votes_repub |> 
+  pcor_dist() |>
+  as.dist() |>
+  usedist::dist_setNames(rownames(votes_repub)) |>
+  hclust(method = "complete") |> 
+  as.dendrogram() |>
+  plot(ylab = "Pearson correlation distance")
+```
+
+## Heatmaps
+
+To expand on the dendrogram, we add heatmaps to help visualize the similarities and differences among states.
+Each color cell represents the observed value given in the dataset (proportion of votes for the Republican candidate).
+As shown in the key, the bluer a box is, the fewer votes the republican candidate received.
+One note is that it is important to note that this does not mean the rest of the votes were given to the democrat candidate because there were still votes for the Green Party and write ins.
+
+### Biweight Heatmap
+
+The biweight correlation is a good method for clustering this data set because we can see the distinct separation between two groups of states. Specifically looking from 2000 to 2020, the heatmap depicts around half of the states mostly voting for the republican candidate and the other half voting in other areas.
+
+
+```{r fig.height = 8, fig.width = 8}
+par(mar = c(1,1,1,1))
+bdend <- all_votes_repub |> 
+  biwt.cor(r = 0.2, absval = FALSE, output = "distance") |>
+  as.dist() |>
+  usedist::dist_setNames(rownames(all_votes_repub)) |> 
+  hclust(method = "complete") |> 
+  as.dendrogram() |> 
+  rotate(labels(dend_NA)) |>
+  color_branches(k=4)
+
+gplots::heatmap.2(as.matrix(all_votes_repub),
+          main = "Votes for\n Republican Presidential Candidate",
+          srtCol = 60,
+          dendrogram = "row",
+          Rowv = bdend,
+          Colv = "NA", # this to make sure the columns are not ordered
+          trace="none",          
+          key.xlab = "% Votes for Republican\n Presidential Candidate",
+          labCol = years,
+          denscol = "grey",
+          density.info = "none",
+          keysize = 1,
+          key.title = "",
+          col = color_gradient
+         )
+```
+
+### Euclidean Heatmap
+
+In the earlier years, each state's voting pattern is well correlated to states with similar voting patterns. Looking at the later years, the voting patterns are more diverse in each correlation group. For example, the blue group has a variety of states with high percentages of votes for the republican candidate and other states with low percentages from 2000 to 2020.
+
+
+```{r fig.height = 8, fig.width = 8}
+par(mar = c(1,1,1,1))
+edend <- votes_repub |> 
+  dist() |>
+  hclust(method = "complete") |> 
+  as.dendrogram() |>
+  rotate(labels(dend_NA)) |>
+  color_branches(k=4)
+
+gplots::heatmap.2(as.matrix(all_votes_repub),
+          main = "Votes for\n Republican Presidential Candidate",
+          srtCol = 60,
+          dendrogram = "row",
+          Rowv = edend,
+          Colv = "NA", # this to make sure the columns are not ordered
+          trace="none",          
+          key.xlab = "% Votes for Republican\n Presidential Candidate",
+          labCol = years,
+          denscol = "grey",
+          density.info = "none",
+          keysize = 1,
+          key.title = "",
+          col = color_gradient
+         )
+```
+
+### Pearson Heatmap
+
+When looking at the most recent years (2000 to 2020), the states are well correlated, except the green group which has a good amount of mixed percentages where some states voted more for the republicans and others did not. The rest of the heatmap does not appear well correlated between states and is spread out.
+
+
+
+```{r fig.height = 8, fig.width = 8}
+par(mar = c(1,1,1,1))
+pdend <- all_votes_repub |> 
+  pcor_dist() |>
+  as.dist() |>
+  usedist::dist_setNames(rownames(all_votes_repub)) |>
+  hclust(method = "complete") |> 
+  as.dendrogram() |>
+  rotate(labels(dend_NA)) |>
+  color_branches(k=4)
+
+gplots::heatmap.2(as.matrix(all_votes_repub),
+          main = "Votes for\n Republican Presidential Candidate",
+          srtCol = 60,
+          dendrogram = "row",
+          Rowv = pdend,
+          Colv = "NA", # this to make sure the columns are not ordered
+          trace="none",          
+          key.xlab = "% Votes for Republican\n Presidential Candidate",
+          labCol = years,
+          denscol = "grey",
+          density.info = "none",
+          keysize = 1,
+          key.title = "",
+          col = color_gradient
+         )
+```
+
 

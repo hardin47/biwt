@@ -8,7 +8,7 @@
 #' @examples
 #' vbw(rnorm(10),3)
 #' @export
-vbw <- function(x,c1) {
-  psibw(x,c1)*x
+vbw <- function(x, c1) {
+  psibw(x, c1) * x
 }
 

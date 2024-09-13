@@ -27,6 +27,9 @@
 #' \item{dist.mat}{a matrix consisting of the correlations converted to distances (either 1 - correlation or 1 - abs(correlation)).}
 #' @examples
 #'
+#' # note that biwt.cor() takes data that is gxn where the
+#' # goal is to find correlations or distances between each of the g items
+#'
 #' samp.data <- t(MASS::mvrnorm(30,mu=c(0,0,0),
 #'                Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3)))
 #'
@@ -49,7 +52,11 @@
 #'
 #' as.dist(samp.bw.dist.mat)
 #' @export
-biwt.cor <- function (x, r = 0.2, output = "matrix", median = TRUE, full.init = TRUE,
+biwt.cor <- function (x,
+                      r = 0.2,
+                      output = "matrix",
+                      median = TRUE,
+                      full.init = TRUE,
                       absval = TRUE)
 {
   if (full.init == TRUE) {
@@ -59,10 +66,9 @@ biwt.cor <- function (x, r = 0.2, output = "matrix", median = TRUE, full.init = 
     }
     else {
       med.init <- list()
-      med.init$cov <- diag(1, 2) * (apply(rand.samp, 1,
-                                          mad, na.rm = TRUE))^2
-      med.init$center <- c(1, 1) * apply(rand.samp, 1,
-                                         median, na.rm = TRUE)
+      med.init$cov <- diag(1, 2) * (apply(rand.samp, 1, mad, na.rm = TRUE)) ^
+        2
+      med.init$center <- c(1, 1) * apply(rand.samp, 1, median, na.rm = TRUE)
     }
   }
   corr <- c()
@@ -77,15 +83,14 @@ biwt.cor <- function (x, r = 0.2, output = "matrix", median = TRUE, full.init = 
           }
           else {
             med.init <- list()
-            med.init$cov <- diag(1, 2) * (apply(cbind(x[i,
-            ], x[j, ]), 2, mad, na.rm = TRUE))^2
-            med.init$center <- apply(cbind(x[i, ], x[j,
-            ]), 2, median, na.rm = TRUE)
+            med.init$cov <- diag(1, 2) * (apply(cbind(x[i, ], x[j, ]), 2, mad, na.rm = TRUE)) ^
+              2
+            med.init$center <- apply(cbind(x[i, ], x[j, ]), 2, median, na.rm = TRUE)
           }
         }
         biwt <- biwt.est(rbind(x[i, ], x[j, ]), r, med.init)
-        corr <- c(corr, biwt$biwt.sig[1, 2]/sqrt(biwt$biwt.sig[1,
-                                                               1] * biwt$biwt.sig[2, 2]))
+        corr <- c(corr,
+                  biwt$biwt.sig[1, 2] / sqrt(biwt$biwt.sig[1, 1] * biwt$biwt.sig[2, 2]))
         j <- j + 1
       }
     }
@@ -103,15 +108,14 @@ biwt.cor <- function (x, r = 0.2, output = "matrix", median = TRUE, full.init = 
           }
           else {
             med.init <- list()
-            med.init$cov <- diag(1, 2) * (apply(cbind(x[i,
-            ], x[j, ]), 2, mad, na.rm = TRUE))^2
-            med.init$center <- apply(cbind(x[i, ], x[j,
-            ]), 2, median, na.rm = TRUE)
+            med.init$cov <- diag(1, 2) * (apply(cbind(x[i, ], x[j, ]), 2, mad, na.rm = TRUE)) ^
+              2
+            med.init$center <- apply(cbind(x[i, ], x[j, ]), 2, median, na.rm = TRUE)
           }
         }
         biwt <- biwt.est(rbind(x[i, ], x[j, ]), r, med.init)
-        corr <- c(corr, biwt$biwt.sig[1, 2]/sqrt(biwt$biwt.sig[1,
-                                                               1] * biwt$biwt.sig[2, 2]))
+        corr <- c(corr,
+                  biwt$biwt.sig[1, 2] / sqrt(biwt$biwt.sig[1, 1] * biwt$biwt.sig[2, 2]))
         j <- j + 1
       }
     }
@@ -134,18 +138,18 @@ biwt.cor <- function (x, r = 0.2, output = "matrix", median = TRUE, full.init = 
           }
           else {
             med.init <- list()
-            med.init$cov <- diag(1, 2) * (apply(cbind(x[i,
-            ], x[j, ]), 2, mad, na.rm = TRUE))^2
-            med.init$center <- apply(cbind(x[i, ], x[j,
-            ]), 2, median, na.rm = TRUE)
+            med.init$cov <- diag(1, 2) * (apply(cbind(x[i, ], x[j, ]), 2, mad, na.rm = TRUE)) ^
+              2
+            med.init$center <- apply(cbind(x[i, ], x[j, ]), 2, median, na.rm = TRUE)
           }
         }
         biwt <- biwt.est(rbind(x[i, ], x[j, ]), r, med.init)
-        corr <- c(corr, biwt$biwt.sig[1, 2]/sqrt(biwt$biwt.sig[1,
-                                                               1] * biwt$biwt.sig[2, 2]))
+        corr <- c(corr,
+                  biwt$biwt.sig[1, 2] / sqrt(biwt$biwt.sig[1, 1] * biwt$biwt.sig[2, 2]))
         j <- j + 1
       }
     }
     return(corr)
   }
 }
+

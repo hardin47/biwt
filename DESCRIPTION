@@ -11,13 +11,11 @@ Depends:
 Imports:
     robustbase,
     stats,
-    hopach,
     MASS
-biocViews: hopach
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyLoad: yes
-URL: https://github.com/hardin47/biwt
+URL: https://github.com/hardin47/biwt, https://hardin47.github.io/biwt/
 BugReports: https://github.com/hardin47/biwt/issues
 RoxygenNote: 7.3.2
 Suggests: 

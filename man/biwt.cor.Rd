@@ -47,6 +47,9 @@ A function to compute the biweight mean vector and covariance matrix
 }
 \examples{
 
+# note that biwt.cor() takes data that is gxn where the
+# goal is to find correlations or distances between each of the g items
+
 samp.data <- t(MASS::mvrnorm(30,mu=c(0,0,0),
                Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3)))
 

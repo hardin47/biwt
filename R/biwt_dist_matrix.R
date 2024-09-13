@@ -10,7 +10,6 @@
 #'
 #' @importFrom MASS mvrnorm
 #' @importFrom robustbase covMcd
-#' @importFrom hopach dissmatrix
 #' @importFrom stats dchisq mad mahalanobis pchisq
 #'
 #' @return Using \code{\link{biwt_est}} to estimate the robust covariance matrix, a robust measure of correlation is computed using Tukey's biweight M-estimator. The biweight correlation is essentially a weighted correlation where the weights are calculated based on the distance of each measurement to the data center with respect to the shape of the data.  The correlations are computed pair-by-pair because the weights should depend only on the pairwise relationship at hand and not the relationship between all the observations globally.  The biwt functions compute many pairwise correlations and create distance matrices for use in other algorithms (e.g., clustering).
@@ -24,6 +23,10 @@
 #' @references Hardin, J., Mitani, A., Hicks, L., VanKoten, B.; A Robust Measure of Correlation Between Two Genes on a Microarray, \emph{BMC Bioinformatics, 8}:220; 2007.
 #'
 #' @examples
+#'
+#' # note that biwt_dist_matrix() takes data that is nxg where the
+#' # goal is to find distances between each of the g items
+#'
 #' samp_data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
 #' r <- 0.2 # breakdown
 #'
@@ -34,51 +37,60 @@
 #' # To convert the distances into an element of class 'dist'
 #' as.dist(samp_bw_dist_mat$biwt_dist_mat)
 #' @export
-biwt_dist_matrix <- function(x, r, median=TRUE, full_init=TRUE, absval=TRUE){
+biwt_dist_matrix <- function(x,
+                             r,
+                             median = TRUE,
+                             full_init = TRUE,
+                             absval = TRUE) {
+  if (full_init == TRUE) {
+    if (median != TRUE) {
+      med.init <- robustbase::covMcd(x)
+    }
+    else	{
+      med.init <- list()
+      med.init$cov <- diag(1, 2) * median(apply(x, 1, stats::mad, na.rm = TRUE))
+      med.init$center <- c(1, 1) * median(apply(x, 1, median, na.rm = TRUE))
+    }
+  }
 
-if (full_init==TRUE){
-
-	if(median!=TRUE){med.init <- robustbase::covMcd(x)}
-	else	{med.init<-list()
-		med.init$cov<-diag(1,2)*median(apply(x,1,stats::mad,na.rm=TRUE))
-		med.init$center<-c(1,1)*median(apply(x,1,median,na.rm=TRUE))
-		}
-	}
-
-	corr <- c()
-	NAid <- c()
-	g <- dim(x)[2]
-
-
-for(i in 1:g){
-	j <- 1
-	while(j < i){
-
-if (full_init !=TRUE){
-
-	if (median!=TRUE) {med.init<-robustbase::covMcd(cbind(x[,i],x[,j]))}
-	else		{med.init<-list()
-			med.init$cov <- diag(1,2)*apply(cbind(x[,i],x[,j]),2,stats::mad,na.rm=TRUE)
-			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=TRUE)}
-	}
-
-	biwt <- biwt_est(cbind(x[,i],x[,j]), r, med.init)
-	corr <- c(corr,biwt$biwt_sig[1,2]/sqrt(biwt$biwt_sig[1,1]*biwt$biwt_sig[2,2]))
-	NAid <- c(NAid,biwt$biwt_NAid)
-	j<-j+1
-	}
-
-	}
-
-if(absval==TRUE){dist.mat <- hopach::dissmatrix(1 - abs(corr))}
-else {dist.mat <- hopach::dissmatrix(1 - corr)}
-
-diag(dist.mat) <- 0
-
-NAid.mat <- hopach::dissmatrix(NAid)
-
-return(list(biwt_dist_mat = dist.mat, biwt_NAid_mat=NAid.mat))}
+  corr <- c()
+  NAid <- c()
+  g <- dim(x)[2]
 
 
+  for (i in 1:g) {
+    j <- 1
+    while (j < i) {
+      if (full_init != TRUE) {
+        if (median != TRUE) {
+          med.init <- robustbase::covMcd(cbind(x[, i], x[, j]))
+        }
+        else		{
+          med.init <- list()
+          med.init$cov <- diag(1, 2) * apply(cbind(x[, i], x[, j]), 2, stats::mad, na.rm = TRUE)
+          med.init$center <- apply(cbind(x[, i], x[, j]), 2, median, na.rm = TRUE)
+        }
+      }
 
+      biwt <- biwt_est(cbind(x[, i], x[, j]), r, med.init)
+      corr <- c(corr,
+                biwt$biwt_sig[1, 2] / sqrt(biwt$biwt_sig[1, 1] * biwt$biwt_sig[2, 2]))
+      NAid <- c(NAid, biwt$biwt_NAid)
+      j <- j + 1
+    }
 
+  }
+
+  if (absval == TRUE) {
+    dist.mat <- vect2diss_hop(1 - abs(corr))
+  }
+  else {
+    dist.mat <- vect2diss_hop(1 - corr)
+  }
+
+  diag(dist.mat) <- 0
+
+  NAid.mat <- vect2diss_hop(NAid)
+
+  return(list(biwt_dist_mat = dist.mat, biwt_NAid_mat = NAid.mat))
+}

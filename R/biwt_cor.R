@@ -19,6 +19,9 @@
 #'
 #' @examples
 #'
+#' # note that biwt_cor() takes data that is nxg where the
+#' # goal is to find correlations between each of the g items
+#'
 #' samp_data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
 #' r <- 0.2 # breakdown
 #'
@@ -27,41 +30,50 @@
 #' samp_bw_cor <- biwt_cor(samp_data,r)
 #' samp_bw_cor
 #' @export
-biwt_cor <- function(x, r, median=TRUE, full_init=TRUE){
+biwt_cor <- function(x,
+                     r,
+                     median = TRUE,
+                     full_init = TRUE) {
+  if (!is.matrix(x))
+    x <- as.matrix(x)
 
-if(!is.matrix(x)) x <- as.matrix(x)
+  if (full_init == TRUE) {
+    if (median != TRUE) {
+      med.init <- robustbase::covMcd(x)
+    }
+    else	{
+      med.init <- list()
+      med.init$cov <- diag(1, 2) * median(apply(x, 1, stats::mad, na.rm = TRUE))
+      med.init$center <- c(1, 1) * median(apply(x, 1, median, na.rm = TRUE))
+    }
+  }
 
-if (full_init==TRUE){
-
-	if(median!=TRUE){med.init <- robustbase::covMcd(x)}
-	else	{med.init<-list()
-		med.init$cov<-diag(1,2)*median(apply(x,1,stats::mad,na.rm=TRUE))
-		med.init$center<-c(1,1)*median(apply(x,1,median,na.rm=TRUE))
-		}
-	}
-
-	corr <- c()
-	NAid <- c()
-	g <- dim(x)[2]
+  corr <- c()
+  NAid <- c()
+  g <- dim(x)[2]
 
 
-for(i in 1:g){
-	j <- 1
-	while(j < i){
+  for (i in 1:g) {
+    j <- 1
+    while (j < i) {
+      if (full_init != TRUE) {
+        if (median != TRUE) {
+          med.init <- robustbase::covMcd(cbind(x[, i], x[, j]))
+        }
+        else		{
+          med.init <- list()
+          med.init$cov <- diag(1, 2) * apply(cbind(x[, i], x[, j]), 2, stats::mad, na.rm = TRUE)
+          med.init$center <- apply(cbind(x[, i], x[, j]), 2, median, na.rm = TRUE)
+        }
+      }
 
-if (full_init !=TRUE){
+      biwt <- biwt_est(cbind(x[, i], x[, j]), r, med.init)
+      corr <- c(corr,
+                biwt$biwt_sig[1, 2] / sqrt(biwt$biwt_sig[1, 1] * biwt$biwt_sig[2, 2]))
+      NAid <- c(NAid, biwt$NAid)
+      j <- j + 1
+    }
 
-	if (median!=TRUE) {med.init <- robustbase::covMcd(cbind(x[,i],x[,j]))}
-	else		{med.init<-list()
-			med.init$cov <- diag(1,2)*apply(cbind(x[,i],x[,j]),2,stats::mad,na.rm=TRUE)
-			med.init$center <- apply(cbind(x[,i],x[,j]),2,median,na.rm=TRUE)}
-	}
-
-	biwt <- biwt_est(cbind(x[,i],x[,j]),r,med.init)
-	corr <- c(corr,biwt$biwt_sig[1,2]/sqrt(biwt$biwt_sig[1,1]*biwt$biwt_sig[2,2]))
-	NAid <- c(NAid,biwt$NAid)
-	j<-j+1
-	}
-
-	}
-return(list(biwt_corr=corr,biwt_NAid=NAid))}
+  }
+  return(list(biwt_corr = corr, biwt_NAid = NAid))
+}

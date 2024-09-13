@@ -29,6 +29,9 @@ A function to compute the biweight mean vector and covariance matrix
 }
 \examples{
 
+# note that biwt_cor() takes data that is nxg where the
+# goal is to find correlations between each of the g items
+
 samp_data <- MASS::mvrnorm(30,mu=c(0,0,0),Sigma=matrix(c(1,.75,-.75,.75,1,-.75,-.75,-.75,1),ncol=3))
 r <- 0.2 # breakdown
 

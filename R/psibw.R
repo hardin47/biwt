@@ -8,8 +8,8 @@
 #' @examples
 #' psibw(rnorm(10),3)
 #' @export
-psibw <- function(x,c1) {
-  ivec <- (abs(x)>c1)
-  (1-ivec)*(x*(1-(x/c1)^2)^2)
+psibw <- function(x, c1) {
+  ivec <- (abs(x) > c1)
+  (1 - ivec) * (x * (1 - (x / c1) ^ 2) ^ 2)
 }
 
