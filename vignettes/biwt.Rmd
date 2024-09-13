@@ -29,7 +29,6 @@ knitr::opts_chunk$set(
   dpi = 100
 )
 library(biwt)
-library(colorspace)
 library(gplots)
 library(dendextend)
 library(tidyverse)
