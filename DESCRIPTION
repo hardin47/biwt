@@ -12,7 +12,12 @@ Imports:
     robustbase,
     stats,
     MASS,
-    tidyverse
+    ggplot2,
+    dplyr,
+    purrr,
+    tidyr,
+    readr,
+    gt
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyLoad: yes
