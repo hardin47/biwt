@@ -62,12 +62,6 @@ Heitkemper, Justine Ouellette, and Johanna Hardin</h4>
 
     
     
-<!--
-vignette: >
-  %\VignetteIndexEntry{Resistant correlations and clustering with the biwt package}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
--->
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -1615,19 +1609,19 @@ lines are at the population correlation, 0.1.
 </h2>
 <p>The following clustering example models data on every US presidential
 election between 1856 and 2020. Each row of the dataset is one of the 50
-united states. Each column represents the percentage of votes for the
+United States. Each column represents the percentage of votes for the
 Republican candidate in the election, over each of the 42 elections from
 1856 to 2020. Note that we are looking to cluster the states, i.e., the
 rows (using information from the years = columns). To that end, the main
 <strong>biwt</strong> R package functions to be used is
 <code><a href="../reference/biwt.cor.html">biwt.cor()</a></code>.</p>
 <p>The data from 1856-1972 are provided in the <strong>cluster</strong>
-R package (available on CRAN) with the dataset name
-<code>votes.repub</code>. The data from <code>1976-2020</code> are found
-at <a href="https://doi.org/10.7910/DVN/42MVDX" class="external-link">Harvard Dataverse, US
+R package (available on <a href="https://cran.r-project.org/web/packages/cluster/index.html" class="external-link">CRAN</a>)
+with the dataset name <code>votes.repub</code>. The data from
+<code>1976-2020</code> are found at <a href="https://doi.org/10.7910/DVN/42MVDX" class="external-link">Harvard Dataverse, US
 President 1976-2020</a>. The second dataset has a CC0 1.0 Universal
-license, and is included in the <strong>biwt</strong> R package as part
-of the vignette.</p>
+license, and is included on the <a href="https://github.com/hardin47/biwt" class="external-link">GitHub repository for the
+<strong>biwt</strong> R package</a> as part of the vignette.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># combining the two datasets and creating </span></span>
 <span><span class="co"># a single data frame with the relevant information</span></span>
@@ -1639,15 +1633,6 @@ of the vignette.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">state</span> <span class="op">!=</span> <span class="st">"DISTRICT OF COLUMBIA"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">year</span>, <span class="va">state</span>, <span class="va">percent</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">pivot_wider</span><span class="op">(</span>id_cols <span class="op">=</span> <span class="va">state</span>, names_from <span class="op">=</span> <span class="va">year</span>, values_from <span class="op">=</span> <span class="va">percent</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">4287</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">15</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> ","</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (6): state, state_po, office, candidate, party_detailed, party_simplified</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): year, state_fips, state_cen, state_ic, candidatevotes, totalvotes, ...</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">lgl</span> (2): writein, notes</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
 <span></span>
 <span><span class="va">all_votes_repub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">votes_repub</span>, <span class="va">newer_president</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">state</span>, <span class="op">-</span><span class="va">X1976</span><span class="op">)</span> </span>
@@ -1688,7 +1673,7 @@ as one minus the biweight correlation between those two states. We can
 observe that there are two quite distinct groups of states: the states
 in the first arm (left side) are primarily states that are now
 considered left leaning or “blue”; the states in the second arm (right
-side) are primarily stats that are now considered right leaning or
+side) are primarily states that are now considered right leaning or
 “red.” The biweight distance measure does an excellent job of
 distinguishing between the two groups of states.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
@@ -1752,22 +1737,24 @@ understanding of political alignment across states.</p>
 <p>To expand on the dendrogram, we add heatmaps to help visualize the
 similarities and differences among states. Each color cell represents
 the observed value given in the dataset (proportion of votes for the
-Republican candidate). As shown in the key, the bluer a box is, the
-fewer votes the republican candidate received. One note is that it is
-important to note that this does not mean the rest of the votes were
-given to the democrat candidate because there were still votes cast, for
-example, for the Green Party candidate and write-in candidates.</p>
-<p>The heatmap examples were heavily inspired by the <a href="Cluster%20Analysis%20vignette">https://cran.r-project.org/web/packages/dendextend/vignettes/Cluster_Analysis.html</a>
-for the <a href="https://cran.r-project.org/web/packages/dendextend/vignettes/dendextend.html" class="external-link"><strong>dendextend</strong>
+Republican candidate). As shown in the key, the more blue a box is, the
+fewer votes the Republican candidate received. We point out that the
+Democratic candidate did not necessarily earn the remainder of the votes
+that the Republican candidate did not earn. For example, there are a
+substantial number of votes cast for the Green Party candidate and
+write-in candidates.</p>
+<p>The heatmap examples were heavily inspired by the <a href="https://cran.r-project.org/web/packages/dendextend/vignettes/Cluster_Analysis.html" class="external-link">Cluster
+Analysis vignette</a> for the <a href="https://cran.r-project.org/web/packages/dendextend/vignettes/dendextend.html" class="external-link"><strong>dendextend</strong>
 R package</a>.</p>
 <div class="section level4">
 <h4 id="biweight-heatmap">Biweight Heatmap<a class="anchor" aria-label="anchor" href="#biweight-heatmap"></a>
 </h4>
-<p>The biweight correlation is a good method for clustering this data
-set because we can see the distinct separation between two groups of
-states. Specifically looking from 2000 to 2020, the heatmap depicts
-around half of the states mostly voting for the republican candidate and
-the other half voting in other areas.</p>
+<p>Extending the dendrogram, we can see that the biweight correlation is
+a good method for clustering the voting dataset because we can see the
+distinct separation between two groups of states. Specifically,
+observing the years from 2000 to 2020, the heatmap depicts roughly half
+of the states voting primarily for the Republican candidate and the
+other half of the states voting primarily for other candidates.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">bdend</span> <span class="op">&lt;-</span> <span class="va">all_votes_repub</span> <span class="op">|&gt;</span> </span>
@@ -1799,12 +1786,13 @@ the other half voting in other areas.</p>
 <div class="section level4">
 <h4 id="euclidean-heatmap">Euclidean Heatmap<a class="anchor" aria-label="anchor" href="#euclidean-heatmap"></a>
 </h4>
-<p>In the earlier years, each state’s voting pattern is well correlated
-to states with similar voting patterns. Looking at the later years, the
-voting patterns are more diverse in each correlation group. For example,
-the blue group has a variety of states with high percentages of votes
-for the republican candidate and other states with low percentages from
-2000 to 2020.</p>
+<p>The Euclidean distance relies heavily on the strong voting patterns
+in the first half of the 20th century. The voting patterns in more
+recent years do not seem to align with the designated clusters. For
+example, the large turquoise group (in the middle) has a variety of
+states with high percentages of votes for the Republican candidate and
+other states with low percentages of votes for the Republican candidate
+from 2000 to 2020.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">edend</span> <span class="op">&lt;-</span> <span class="va">votes_repub</span> <span class="op">|&gt;</span> </span>
@@ -1834,11 +1822,12 @@ for the republican candidate and other states with low percentages from
 <div class="section level4">
 <h4 id="pearson-heatmap">Pearson Heatmap<a class="anchor" aria-label="anchor" href="#pearson-heatmap"></a>
 </h4>
-<p>When looking at the most recent years (2000 to 2020), the states are
-well correlated, except the green group which has a good amount of mixed
-percentages where some states voted more for the republicans and others
-did not. The rest of the heatmap does not appear well correlated between
-states and is spread out.</p>
+<p>When looking at the most recent years (2000 to 2020), the voting data
+mostly aligns with the clusters. The olive green group, however,
+includes mixed percentages, where some states voted more for the
+Republican candidate and others did not. The earlier years of data do
+not seem to be as strongly aligned with the clustering results in the
+dendrogram.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">pdend</span> <span class="op">&lt;-</span> <span class="va">all_votes_repub</span> <span class="op">|&gt;</span> </span>
@@ -1880,7 +1869,7 @@ states and is spread out.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>
