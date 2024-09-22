@@ -11,18 +11,7 @@ Depends:
 Imports:
     robustbase,
     stats,
-    MASS,
-    ggplot2,
-    dplyr,
-    purrr,
-    tidyr,
-    readr,
-    gt,
-    dendextend,
-    colorspace,
-    cluster,
-    usedist,
-    gplots
+    MASS
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyLoad: yes
@@ -32,6 +21,17 @@ RoxygenNote: 7.3.2
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    ggplot2, 
+    dplyr, 
+    purrr, 
+    tidyr, 
+    readr, 
+    gt, 
+    dendextend, 
+    colorspace, 
+    cluster, 
+    usedist, 
+    gplots 
 Config/testthat/edition: 3
 VignetteBuilder: knitr

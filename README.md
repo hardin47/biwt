@@ -1,4 +1,4 @@
-# biwt: Compute the Biweight Mean Vector and Covariance & Correlation Matrices
+# biwt: Compute Tukey's biweight location, scale, and correlation estimates
 
 
 ### Overview

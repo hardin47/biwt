@@ -9,24 +9,17 @@ vignette: >
   %\VignetteIndexEntry{Resistant correlations and clustering with the biwt package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-execute:
-  warning: false
-  message: false
 ---
 
-<!--
-vignette: >
-  %\VignetteIndexEntry{Resistant correlations and clustering with the biwt package}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
---> 
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.align = "center",
-  dpi = 100
+  dpi = 100,
+  message = FALSE,
+  warning = FALSE
 )
 library(biwt)
 library(ggplot2)
@@ -428,14 +421,14 @@ correlation4 |>
 # Presidential Candidate Voting Data
 
 The following clustering example models data on every US presidential election between 1856 and 2020.
-Each row of the dataset is one of the 50 united states.
+Each row of the dataset is one of the 50 United States.
 Each column represents the percentage of votes for the Republican candidate in the election, over each of the 42 elections from 1856 to 2020.
 Note that we are looking to cluster the states, i.e., the rows (using information from the years = columns).
 To that end, the main **biwt** R package functions to be used is `biwt.cor()`.
 
-The data from 1856-1972 are provided in the **cluster** R package (available on CRAN) with the dataset name `votes.repub`.
+The data from 1856-1972 are provided in the **cluster** R package (available on [CRAN](https://cran.r-project.org/web/packages/cluster/index.html)) with the dataset name `votes.repub`.
 The data from `1976-2020` are found at [Harvard Dataverse, US President 1976-2020](https://doi.org/10.7910/DVN/42MVDX).
-The second dataset has a CC0 1.0 Universal license, and is included in the **biwt** R package as part of the vignette.
+The second dataset has a CC0 1.0 Universal license, and is included on the [GitHub repository for the **biwt** R package](https://github.com/hardin47/biwt) as part of the vignette.
 
 
 ```{r}
@@ -480,7 +473,7 @@ That is, the biweight correlation distance was the best model option.
 ### Biweight dendrogram
 
 The biweight correlation distance (between two states) is calculated as one minus the biweight correlation between those two states.
-We can observe that there are two quite distinct groups of states: the states in the first arm (left side) are primarily states that are now considered left leaning or "blue"; the states in the second arm (right side) are primarily stats that are now considered right leaning or "red."
+We can observe that there are two quite distinct groups of states: the states in the first arm (left side) are primarily states that are now considered left leaning or "blue"; the states in the second arm (right side) are primarily states that are now considered right leaning or "red."
 The biweight distance measure does an excellent job of distinguishing between the two groups of states.
 
 ```{r fig.width = 9, fig.height = 5}
@@ -533,15 +526,17 @@ dist.repub <- all_votes_repub |>
 
 To expand on the dendrogram, we add heatmaps to help visualize the similarities and differences among states.
 Each color cell represents the observed value given in the dataset (proportion of votes for the Republican candidate).
-As shown in the key, the bluer a box is, the fewer votes the republican candidate received.
-One note is that it is important to note that this does not mean the rest of the votes were given to the democrat candidate because there were still votes cast, for example, for the Green Party candidate and write-in candidates.
+As shown in the key, the more blue a box is, the fewer votes the Republican candidate received.
+We point out that the Democratic candidate did not necessarily earn the remainder of the votes that the Republican candidate did not earn.
+For example, there are a substantial number of votes cast for the Green Party candidate and write-in candidates.
 
-The heatmap examples were heavily inspired by the [https://cran.r-project.org/web/packages/dendextend/vignettes/Cluster_Analysis.html](Cluster Analysis vignette) for the [**dendextend** R package](https://cran.r-project.org/web/packages/dendextend/vignettes/dendextend.html).
+The heatmap examples were heavily inspired by the [Cluster Analysis vignette](https://cran.r-project.org/web/packages/dendextend/vignettes/Cluster_Analysis.html) for the [**dendextend** R package](https://cran.r-project.org/web/packages/dendextend/vignettes/dendextend.html).
 
 
 ### Biweight Heatmap
 
-The biweight correlation is a good method for clustering this data set because we can see the distinct separation between two groups of states. Specifically looking from 2000 to 2020, the heatmap depicts around half of the states mostly voting for the republican candidate and the other half voting in other areas.
+Extending the dendrogram, we can see that the biweight correlation is a good method for clustering the voting dataset because we can see the distinct separation between two groups of states.
+Specifically, observing the years from 2000 to 2020, the heatmap depicts roughly half of the states voting primarily for the Republican candidate and the other half of the states voting primarily for other candidates.
 
 
 ```{r fig.height = 8, fig.width = 8}
@@ -574,7 +569,9 @@ gplots::heatmap.2(as.matrix(all_votes_repub),
 
 ### Euclidean Heatmap
 
-In the earlier years, each state's voting pattern is well correlated to states with similar voting patterns. Looking at the later years, the voting patterns are more diverse in each correlation group. For example, the blue group has a variety of states with high percentages of votes for the republican candidate and other states with low percentages from 2000 to 2020.
+The Euclidean distance relies heavily on the strong voting patterns in the first half of the 20th century.
+The voting patterns in more recent years do not seem to align with the designated clusters.
+For example, the large turquoise group (in the middle) has a variety of states with high percentages of votes for the Republican candidate and other states with low percentages of votes for the Republican candidate from 2000 to 2020.
 
 
 ```{r fig.height = 8, fig.width = 8}
@@ -605,8 +602,8 @@ gplots::heatmap.2(as.matrix(all_votes_repub),
 
 ### Pearson Heatmap
 
-When looking at the most recent years (2000 to 2020), the states are well correlated, except the green group which has a good amount of mixed percentages where some states voted more for the republicans and others did not. The rest of the heatmap does not appear well correlated between states and is spread out.
-
+When looking at the most recent years (2000 to 2020), the voting data mostly aligns with the clusters.  The olive green group, however, includes mixed percentages, where some states voted more for the Republican candidate and others did not.
+The earlier years of data do not seem to be as strongly aligned with the clustering results in the dendrogram.
 
 
 ```{r fig.height = 8, fig.width = 8}
