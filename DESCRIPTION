@@ -1,6 +1,6 @@
 Package: biwt
 Type: Package
-Title: Functions to compute the biweight mean vector and covariance and correlation matrices
+Title: Functions to Compute the Biweight Mean Vector and Covariance and Correlation Matrices
 Version: 1.1.0
 Authors@R: c(
    person(given = "Johanna", family = "Hardin", email = "jo.hardin@pomona.edu", role = c("aut", "cre")))
